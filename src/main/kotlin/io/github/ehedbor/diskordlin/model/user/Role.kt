@@ -1,4 +1,4 @@
-package io.github.ehedbor.diskordlin.models
+package io.github.ehedbor.diskordlin.model.user
 
 data class Role(
     var id: String? = null,
