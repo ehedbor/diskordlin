@@ -7,4 +7,4 @@ data class HeartbeatPayload(
     val opcode: Int? = null,
     @SerializedName("d")
     val lastSequenceNumber: Int? = null
-) : IGatewayPayload
+)

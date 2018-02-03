@@ -3,20 +3,20 @@ package io.github.ehedbor.diskordlin.model.gateway
 import com.google.gson.annotations.SerializedName
 
 data class IdentifyPayload(
-    val token: String? = null,
-    val properties: IdentifyProperties? = null,
-    val compress: Boolean? = null,
+    val token: String,
+    val properties: IdentifyProperties,
+    val compress: Boolean,
     @SerializedName("large_threshold")
-    val largeThreshold: Int? = null,
+    val largeThreshold: Int,
     val shard: List<Int> = emptyList(),
-    val presence: StatusUpdatePayload? = null
-) : IGatewayPayload
+    val presence: StatusUpdate
+)
 
 data class IdentifyProperties(
     @SerializedName("\$os")
-    val os: String? = null,
+    val os: String,
     @SerializedName("\$browser")
-    val browser: String? = null,
+    val browser: String,
     @SerializedName("\$device")
-    val device: String? = null
+    val device: String
 )

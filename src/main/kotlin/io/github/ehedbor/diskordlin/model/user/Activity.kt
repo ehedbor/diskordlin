@@ -3,8 +3,8 @@ package io.github.ehedbor.diskordlin.model.user
 import com.google.gson.annotations.SerializedName
 
 data class Activity(
-    val name: String? = null,
-    val type: Int? = null,
+    val name: String,
+    val type: Int,
     val url: String? = null,
     val timestamps: Timestamps? = null,
     @SerializedName("application_id")
@@ -14,6 +14,12 @@ data class Activity(
     val party: Party? = null,
     val assets: Assets? = null
 )
+
+object ActivityType {
+    const val GAME = 0
+    const val STREAMING = 1
+    const val LISTENING = 2
+}
 
 data class Timestamps(val start: Long? = null, val end: Long? = null)
 

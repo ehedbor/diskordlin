@@ -4,6 +4,11 @@ import com.google.gson.annotations.SerializedName
 import io.github.ehedbor.diskordlin.model.user.Role
 import io.github.ehedbor.diskordlin.model.user.User
 
+/**
+ * A message sent over the Discord API.
+ *
+ * @param id The message 
+ */
 @Suppress("MemberVisibilityCanPrivate")
 data class Message(
     val id: String,

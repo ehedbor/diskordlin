@@ -7,4 +7,4 @@ data class HelloPayload(
     val heartbeatInterval: Long,
     @SerializedName("_trace")
     val trace: List<String> = emptyList()
-) : IGatewayPayload
+)

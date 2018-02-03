@@ -1,4 +1,4 @@
-package io.github.ehedbor.diskordlin.unittests
+package unittests
 
 import io.github.ehedbor.diskordlin.model.chat.*
 import io.github.ehedbor.diskordlin.model.user.User

@@ -1,4 +1,4 @@
-package io.github.ehedbor.diskordlin.unittests
+package unittests
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
