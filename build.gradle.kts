@@ -37,11 +37,13 @@ dependencies {
     compile("com.github.salomonbrys.kotson:kotson:$kotsonVersion")
     compile("com.github.kittinunf.fuel:fuel:$fuelVersion")
     compile("com.github.kittinunf.fuel:fuel-gson:$fuelVersion")
-    //compile("org.slf4j:slf4j-api:$slf4jVersion")
-    //compile("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
+    compile("org.slf4j:slf4j-api:$slf4jVersion")
+    compile("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
     testCompile("io.kotlintest:kotlintest:$kotlinTestVersion")
-    //testCompile("org.slf4j:slf4j-simple:$slf4jVersion")
+    testCompile("org.apache.logging.log4j:log4j-api:2.7")
+    testCompile("org.apache.logging.log4j:log4j-core:2.7")
+    testCompile("org.apache.logging.log4j:log4j-slf4j-impl:2.7")
 }
 
 tasks {

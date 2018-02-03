@@ -3,6 +3,7 @@ package io.github.ehedbor.diskordlin.client
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import io.github.ehedbor.diskordlin.Diskordlin.LOGGER
 import io.github.ehedbor.diskordlin.event.Events
 import io.github.ehedbor.diskordlin.model.chat.Channel
 import io.github.ehedbor.diskordlin.model.chat.UnavailableGuild
@@ -44,7 +45,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      */
     @OnOpen
     internal fun onConnectionOpened(session: Session) {
-        println("Starting connection!")
+        LOGGER.info("Opening websocket connection.")
         this.session = session
     }
 
@@ -53,7 +54,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      */
     @OnClose
     internal fun onConnectionClosed(closeReason: CloseReason) {
-        println("Closing connection: $closeReason")
+        LOGGER.info("Closing websocket connection: $closeReason")
         session.close(closeReason)
     }
 
@@ -62,13 +63,10 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      */
     @OnMessage
     internal fun onMessageReceived(message: String) {
-        val formattedGson = GsonBuilder()
-            .setPrettyPrinting()
-            .create()
-        println(formattedGson.toJson(formattedGson.fromJson(message)))
-
         val gson = Gson()
         val payload = gson.fromJson<Payload>(message)
+
+        LOGGER.info("Received message with opcode ${payload.opcode}.")
 
         when (payload.opcode) {
             Opcode.HELLO -> {
@@ -77,7 +75,6 @@ internal class DiscordClient(val token: String, endpointUri: String) {
                 this.startHeartbeat(interval)
             }
             Opcode.HEARTBEAT_ACK -> {
-                println("Received heartbeat acknowledgement!")
                 if (!hasIdentified) {
                     this.identify()
                     hasIdentified = true
@@ -98,8 +95,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      */
     @OnError
     internal fun onError(throwable: Throwable) {
-        println("Error: ${throwable.message}")
-        throwable.printStackTrace()
+        LOGGER.error("An error occurred: ${throwable.message}", throwable)
     }
 
     /**
@@ -132,6 +128,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Sends an identify payload.
      */
     private fun identify() {
+        LOGGER.info("Sending identify payload.")
         // TODO don't hardcode the identify properties
         val identifyPayload = IdentifyPayload(
             token = token,
@@ -161,6 +158,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Starts sending heartbeats at the specified [interval].
      */
     private fun startHeartbeat(interval: Long) {
+        LOGGER.info("Starting heartbeat.")
         val ctx = newSingleThreadContext("Heartbeat")
         launch(ctx) {
             while (true) {
@@ -174,14 +172,12 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Sends a heartbeat.
      */
     private fun sendHeartbeat() {
-        val msg = Payload(Opcode.HEARTBEAT)
+        LOGGER.info("Sending heartbeat!")
 
+        val msg = Payload(Opcode.HEARTBEAT)
         val gson = GsonBuilder()
             .serializeNulls()
             .create()
-
-        val jsonMessage = gson.toJson(msg)
-        println("Sending heartbeat! $jsonMessage")
-        this.sendMessage(jsonMessage)
+        this.sendMessage(gson.toJson(msg))
     }
 }
