@@ -1,43 +1,35 @@
 package io.github.ehedbor.diskordlin
 
+import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.gson.responseObject
-import com.github.kittinunf.fuel.httpGet
 import io.github.ehedbor.diskordlin.client.ClientType
 import io.github.ehedbor.diskordlin.client.DiscordClient
-import io.github.ehedbor.diskordlin.exception.DiscordException
 import io.github.ehedbor.diskordlin.model.gateway.GatewayBotResponse
-import io.github.ehedbor.diskordlin.util.addHeaders
 import kotlinx.coroutines.experimental.async
 import org.slf4j.LoggerFactory
 
 /**
  * The main Diskordlin API.
  */
+@Suppress("MemberVisibilityCanBePrivate")
 object Diskordlin {
 
     /** The Discord API version. */
-    @Suppress("MemberVisibilityCanBePrivate")
     const val API_VERSION = "6"
 
     /**
      * The Discord Websocket API version (Discord has separate versioning
-     * schemes for the HTTP and websocket APIs).
+     * schemes for the HTTP and Websocket APIs).
      */
-    @Suppress("MemberVisibilityCanBePrivate")
     const val WEBSOCKET_API_VERSION = "6"
 
     /**
-     * The Discord HTTP API URL.
+     * The URL for the Discord HTTP API.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
-    const val API_URL = "https://discordapp.com/api/v$API_VERSION"
+    const val API = "https://discordapp.com/api/v$API_VERSION"
 
-    @Suppress("MemberVisibilityCanBePrivate")
     internal const val HTTP_USER_AGENT = "diskordlin (https://github.com/ehedbor/diskordlin, 1.0-SNAPSHOT)"
 
-    /**
-     * The logger used for logging.
-     */
     @JvmStatic
     internal val LOGGER = LoggerFactory.getLogger(Diskordlin::class.java)
 
@@ -51,7 +43,7 @@ object Diskordlin {
      */
     @Suppress("RemoveExplicitTypeArguments")
     fun loginAsync(token: String, clientType: ClientType) = async<Unit> {
-        loginBlocking(token, clientType)
+        login(token, clientType)
     }
 
     /**
@@ -60,9 +52,10 @@ object Diskordlin {
      * @param token The authentication token.
      * @param clientType The type of client logging in.
      */
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun loginBlocking(token: String, clientType: ClientType) {
-        val response = getGatewayBlocking(token, clientType)
+    fun login(token: String, clientType: ClientType) {
+        require(clientType == ClientType.BOT) { "Only bot clients are supported right now, sorry!" }
+
+        val response = getBotGateway(token)
         // add encoding and version info
         val url = response.url + "/?encoding=json&v=$WEBSOCKET_API_VERSION"
         // create the client endpoint
@@ -71,17 +64,19 @@ object Diskordlin {
         LOGGER.info("Successfully logged in!")
     }
 
-    private fun getGatewayBlocking(token: String, clientType: ClientType): GatewayBotResponse {
+    private fun getBotGateway(token: String): GatewayBotResponse {
         LOGGER.info("Attempting to log into Discord...")
 
-        require(clientType == ClientType.BOT) { "Only bot clients are supported right now, sorry!" }
-        // blocking get request
-        val (_, _, result) = (API_URL + "/gateway/bot").httpGet()
-            // These headers are required!
-            .addHeaders("Authorization" to "${clientType.displayValue} $token", "User-Agent" to HTTP_USER_AGENT)
+        // Blocking get request
+        val (_, _, result) = Fuel.get(API + "/gateway/bot")
+            .header("User-Agent" to HTTP_USER_AGENT)
+            .header("Authorization" to "Bot $token")
             .responseObject<GatewayBotResponse>()
 
-        return result.component1() ?: throw DiscordException("Unable to get response from Discord API!")
+        result.fold(
+            success = { return it },
+            failure = { throw it.exception }
+        )
     }
 }
 

@@ -1,6 +1,7 @@
 package io.github.ehedbor.diskordlin.model.chat
 
 import com.google.gson.annotations.SerializedName
+import io.github.ehedbor.diskordlin.model.Snowflake
 import io.github.ehedbor.diskordlin.model.user.Role
 import io.github.ehedbor.diskordlin.model.user.User
 
@@ -11,27 +12,27 @@ import io.github.ehedbor.diskordlin.model.user.User
  */
 @Suppress("MemberVisibilityCanPrivate")
 data class Message(
-    val id: String,
+    val id: Snowflake,
     @SerializedName("channel_id")
-    val channelId: String,
+    val channelId: Snowflake,
     val author: User,
     val content: String,
     val timestamp: String,
     @SerializedName("edited_timestamp")
-    val editedTimestamp: Any? = null,
-    val tts: Boolean,
+    val editedTimestamp: String? = null,
+    val tts: Boolean = false,
     @SerializedName("mention_everyone")
-    val mentionEveryone: Boolean,
+    val mentionEveryone: Boolean = false,
     val mentions: List<User> = emptyList(),
     @SerializedName("mention_roles")
     val mentionRoles: List<Role> = emptyList(),
     val attachments: List<Attachment> = emptyList(),
     val embeds: List<Embed> = emptyList(),
     val reactions: List<Reaction> = emptyList(),
-    val nonce: String? = null,
-    val pinned: Boolean,
+    val nonce: Snowflake? = null,
+    val pinned: Boolean = false,
     @SerializedName("webhook_id")
-    val webhookId: String? = null,
+    val webhookId: Snowflake? = null,
     val type: Int
 )
 

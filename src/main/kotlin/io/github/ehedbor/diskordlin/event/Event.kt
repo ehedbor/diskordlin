@@ -7,34 +7,36 @@ package io.github.ehedbor.diskordlin.event
  */
 class Event<T> {
 
-    private val handlers: MutableMap<String?, MutableList<EventHandler<T>>> = mutableMapOf()
+    private val listeners: MutableMap<String?, MutableList<EventListener<T>>> = mutableMapOf()
 
     @JvmName("put")
-    operator fun plusAssign(handler: EventHandler<T>) = set(null, handler)
+    operator fun plusAssign(handler: EventListener<T>) = set(null, handler)
 
     @JvmName("put")
-    operator fun plusAssign(namedHandler: Pair<String?, EventHandler<T>>) = set(namedHandler.first, namedHandler.second)
+    operator fun plusAssign(namedHandler: Pair<String?, EventListener<T>>) = set(namedHandler.first, namedHandler.second)
 
     @JvmName("put")
-    operator fun set(eventName: String?, eventHandler: EventHandler<T>) {
-        if (handlers[eventName] == null) {
-            handlers[eventName] = mutableListOf()
+    operator fun set(eventName: String?, eventHandler: EventListener<T>) {
+        if (listeners[eventName] == null) {
+            listeners[eventName] = mutableListOf()
         }
-        handlers[eventName]!! += eventHandler
+        listeners[eventName]!! += eventHandler
     }
 
     /**
-     * Removes all event associated with this identifier.
+     * Removes all events associated with this identifier.
      */
     @JvmName("remove")
     operator fun minusAssign(eventName: String?) {
-        handlers.remove(eventName)
+        listeners.remove(eventName)
     }
 
-    @JvmName("handle")
+    /**
+     * Executes every listener to this event.
+     */
     operator fun invoke(parameter: T) {
-        for ((_, handlerList) in handlers) {
-            handlerList.forEach { it(parameter) }
+        for ((_, listenerList) in listeners) {
+            listenerList.forEach { it(parameter) }
         }
     }
 }

@@ -1,6 +1,7 @@
 package io.github.ehedbor.diskordlin.model.user
 
 import com.google.gson.annotations.SerializedName
+import io.github.ehedbor.diskordlin.model.Snowflake
 
 data class Activity(
     val name: String,
@@ -8,7 +9,7 @@ data class Activity(
     val url: String? = null,
     val timestamps: Timestamps? = null,
     @SerializedName("application_id")
-    val applicationId: String? = null,
+    val applicationId: Snowflake? = null,
     val details: String? = null,
     val state: String? = null,
     val party: Party? = null,
@@ -23,7 +24,7 @@ object ActivityType {
 
 data class Timestamps(val start: Long? = null, val end: Long? = null)
 
-data class Party(val id: String? = null, val size: List<Int> = listOf())
+data class Party(val id: Snowflake? = null, val size: List<Int> = listOf())
 
 data class Assets(
     @SerializedName("large_image")

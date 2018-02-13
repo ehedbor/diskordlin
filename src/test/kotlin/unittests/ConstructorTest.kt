@@ -1,5 +1,6 @@
 package unittests
 
+import io.github.ehedbor.diskordlin.model.Snowflake
 import io.github.ehedbor.diskordlin.model.chat.*
 import io.github.ehedbor.diskordlin.model.user.User
 import io.kotlintest.matchers.shouldBe
@@ -16,21 +17,22 @@ class ConstructorTest : StringSpec() {
             )
         )
 
-        val message = Message(id = "hello",
+        val message = Message(id = Snowflake("lol"),
             timestamp = "3281998322",
             embeds = listOf(embed),
             type = MessageType.DEFAULT,
             author = User(
-                "hi",
+                Snowflake("hi"),
                 "yo",
                 "3213"
             ),
-            channelId = "2", content = "What is up dud!",
+            channelId = Snowflake("2"),
+            content = "What is up dud!",
             mentionEveryone = false,
             pinned = false,
             tts = false)
 
-        message.id shouldBe "hello"
+        message.id shouldBe Snowflake("hello")
         message.timestamp shouldBe "3281998322"
         message.type shouldBe MessageType.DEFAULT
 

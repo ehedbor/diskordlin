@@ -1,7 +1,9 @@
 package io.github.ehedbor.diskordlin.model.user
 
+import io.github.ehedbor.diskordlin.model.Snowflake
+
 data class Role(
-    var id: String? = null,
+    var id: Snowflake? = null,
     var name: String? = null,
     var color: Int? = null,
     var hoist: Boolean? = null,

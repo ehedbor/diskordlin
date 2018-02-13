@@ -2,6 +2,7 @@ package unittests
 
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
+import io.github.ehedbor.diskordlin.model.Snowflake
 import io.github.ehedbor.diskordlin.model.chat.Emoji
 import io.github.ehedbor.diskordlin.model.chat.Message
 import io.github.ehedbor.diskordlin.model.user.User
@@ -49,7 +50,7 @@ class MessageModelTest : StringSpec() {
 
             message shouldNotBe null
 
-            val reaction = message!!.reactions[0]
+            val reaction = message.reactions[0]
             reaction.count shouldBe 1
             reaction.me shouldBe false
             reaction.emoji shouldBe Emoji(id = null, name = "🔥")
@@ -63,7 +64,7 @@ class MessageModelTest : StringSpec() {
             message.pinned shouldBe false
             message.editedTimestamp shouldBe null
             message.author shouldBe User(username = "Mason", discriminator = "9999",
-                id = "53908099506183680", avatar = "a_bab14f271d565501444b2ca3be944b25")
+                id = Snowflake("53908099506183680"), avatar = "a_bab14f271d565501444b2ca3be944b25")
             message.mentionRoles.isEmpty() shouldBe true
             message.content shouldBe "Supa Hot"
             message.channelId shouldBe "290926798999357250"

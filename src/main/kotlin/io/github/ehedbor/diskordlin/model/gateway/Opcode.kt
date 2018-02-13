@@ -13,4 +13,20 @@ object Opcode {
     const val INVALID_SESSION = 9
     const val HELLO = 10
     const val HEARTBEAT_ACK = 11
+
+    fun nameOf(op: Int) = when (op) {
+        DISPATCH              -> "DISPATCH"
+        HEARTBEAT             -> "HEARTBEAT"
+        IDENTIFY              -> "IDENTIFY"
+        STATUS_UPDATE         -> "STATUS_UPDATE"
+        VOICE_STATE_UPDATE    -> "VOICE_STATE_UPDATE"
+        VOICE_SERVER_PING     -> "VOICE_SERVER_PING"
+        RESUME                -> "RESUME"
+        RECONNECT             -> "RECONNECT"
+        REQUEST_GUILD_MEMBERS -> "REQUEST_GUILD_MEMBERS"
+        INVALID_SESSION       -> "INVALID_SESSION"
+        HELLO                 -> "HELLO"
+        HEARTBEAT_ACK         -> "HEARTBEAT_ACK"
+        else                  -> throw IllegalArgumentException("Illegal value!")
+    }
 }

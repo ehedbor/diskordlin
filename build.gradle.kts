@@ -40,6 +40,7 @@ dependencies {
     compile("org.slf4j:slf4j-api:$slf4jVersion")
     compile("io.github.microutils:kotlin-logging:$kotlinLoggingVersion")
 
+
     testCompile("io.kotlintest:kotlintest:$kotlinTestVersion")
     testCompile("org.apache.logging.log4j:log4j-api:2.7")
     testCompile("org.apache.logging.log4j:log4j-core:2.7")

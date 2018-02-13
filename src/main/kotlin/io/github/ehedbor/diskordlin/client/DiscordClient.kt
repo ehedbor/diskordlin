@@ -6,13 +6,14 @@ import com.google.gson.GsonBuilder
 import io.github.ehedbor.diskordlin.Diskordlin.LOGGER
 import io.github.ehedbor.diskordlin.event.Events
 import io.github.ehedbor.diskordlin.model.chat.Channel
+import io.github.ehedbor.diskordlin.model.chat.Message
 import io.github.ehedbor.diskordlin.model.chat.UnavailableGuild
 import io.github.ehedbor.diskordlin.model.gateway.*
 import io.github.ehedbor.diskordlin.model.gateway.event.ReadyEvent
 import io.github.ehedbor.diskordlin.model.user.Activity
 import io.github.ehedbor.diskordlin.model.user.ActivityType
 import io.github.ehedbor.diskordlin.model.user.User
-import io.github.ehedbor.diskordlin.util.uncompressGZip
+import io.github.ehedbor.diskordlin.util.decompressZLib
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.newSingleThreadContext
@@ -63,10 +64,12 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      */
     @OnMessage
     internal fun onMessageReceived(message: String) {
-        val gson = Gson()
-        val payload = gson.fromJson<Payload>(message)
+        val payload = Gson().fromJson<Payload>(message)
 
-        LOGGER.info("Received message with opcode ${payload.opcode}.")
+        if (payload.opcode == Opcode.DISPATCH)
+            LOGGER.info("Received event (${payload.eventName}).")
+        else
+            LOGGER.info("Received message (${Opcode.nameOf(payload.opcode)}).")
 
         when (payload.opcode) {
             Opcode.HELLO -> {
@@ -88,7 +91,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Called when a compressed [message] is received.
      */
     @OnMessage
-    internal fun onBinaryMessageReceived(message: ByteArray)= onMessageReceived(uncompressGZip(message))
+    internal fun onBinaryMessageReceived(message: ByteArray)= onMessageReceived(decompressZLib(message))
 
     /**
      * Called when a [throwable] is thrown.
@@ -120,6 +123,13 @@ internal class DiscordClient(val token: String, endpointUri: String) {
                 this.joinedGuilds = data.guilds
                 this.sessionId = data.sessionId
                 Events.ready(data)
+            }
+            "MESSAGE_CREATE" -> {
+                val msg = payload.getDataAs<Message>()!!
+                Events.messageCreate(msg)
+            }
+            else -> {
+                LOGGER.trace("Unhandled event type \"${payload.eventName}\"")
             }
         }
     }
