@@ -1,8 +1,8 @@
 package unittests
 
-import io.github.ehedbor.diskordlin.model.Snowflake
-import io.github.ehedbor.diskordlin.model.chat.*
-import io.github.ehedbor.diskordlin.model.user.User
+import io.github.ehedbor.diskordlin.entities.Snowflake
+import io.github.ehedbor.diskordlin.entities.channel.*
+import io.github.ehedbor.diskordlin.entities.user.User
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.StringSpec
 

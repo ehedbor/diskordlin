@@ -1,4 +1,4 @@
-package io.github.ehedbor.diskordlin.model.chat
+package io.github.ehedbor.diskordlin.entities.channel
 
 import com.google.gson.annotations.SerializedName
 

@@ -1,9 +1,9 @@
-package io.github.ehedbor.diskordlin.model.gateway.event
+package io.github.ehedbor.diskordlin.entities.gateway.event
 
 import com.google.gson.annotations.SerializedName
-import io.github.ehedbor.diskordlin.model.chat.Channel
-import io.github.ehedbor.diskordlin.model.chat.UnavailableGuild
-import io.github.ehedbor.diskordlin.model.user.User
+import io.github.ehedbor.diskordlin.entities.channel.Channel
+import io.github.ehedbor.diskordlin.entities.guild.UnavailableGuild
+import io.github.ehedbor.diskordlin.entities.user.User
 
 data class ReadyEvent(
     @SerializedName("v")

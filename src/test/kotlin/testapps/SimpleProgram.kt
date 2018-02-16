@@ -1,43 +1,57 @@
 package testapps
 
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.gson.responseObject
 import io.github.ehedbor.diskordlin.Diskordlin
 import io.github.ehedbor.diskordlin.client.ClientType
+import io.github.ehedbor.diskordlin.entities.channel.Message
 import io.github.ehedbor.diskordlin.event.Events
-import io.github.ehedbor.diskordlin.model.chat.Message
+import io.github.ehedbor.diskordlin.util.info
 import kotlinx.coroutines.experimental.runBlocking
-import org.slf4j.LoggerFactory
+import java.util.regex.Pattern
 
-private const val TOKEN = "MzkxMzYyOTQyNDIwOTEwMDgw.DTwgnw.wupFapxhzvuPsi-DIGRRiGWYaHg"
-private val LOGGER = LoggerFactory.getLogger("Test")
+object SimpleProgram {
 
-fun main(args: Array<String>): Unit = runBlocking {
-    Events.ready += {
-        LOGGER.info("I called an event!")
-    }
-    Events.ready["Hello"] = {
-        LOGGER.info("Called event hello!")
-    }
-    //Events.messageCreate += ::onMessageCreated
+    private const val TOKEN = "MzkxMzYyOTQyNDIwOTEwMDgw.DTwgnw.wupFapxhzvuPsi-DIGRRiGWYaHg"
 
-    Diskordlin.login(TOKEN, ClientType.BOT)
+    fun main(args: Array<String>): Unit = runBlocking {
 
-    //Delay forever
-    while (true) {
-    }
-}
+        Diskordlin(TOKEN, ClientType.BOT).apply {
+            Events.messageCreate += ::onMessageCreated
 
-fun onMessageCreated(message: Message) {
-    if (message.content.contains("gay")) {
-        val channelId = message.channelId
-        Fuel.post(Diskordlin.API + "/channels/$channelId/messages")
-            .body("{\"content\":\"thats gay\"}")
-            .responseObject<Message> { _, _, result ->
-                val (_, error) = result
-                if (error != null) {
-                    LOGGER.warn("Error occured while trying to send message!")
-                }
+            Events.ready += {
+                info("Hello")
             }
+            login()
+        }
+        // What I'd like the api to look like in the future
+        """
+        diskordlin {
+            token = TOKEN
+            type = ClientType.BOT
+            messageCreate += ::onMessageCreated
+            typingStart += { event ->
+                event.reply("No typing allowed")
+            }
+        }
+       """.trimMargin()
+
+        //Delay forever
+        while (true) {
+        }
+    }
+
+    private fun onMessageCreated(message: Message) {
+        if (message.content.startsWith("$")) {
+            info("Received command ${message.content}")
+
+            val parameters = message.content
+                .substring(1)
+                .split(Pattern.compile("\\n"))
+            val cmd = parameters[0].toLowerCase()
+            if (cmd == "greeting") {
+                //message.reply("Pong!")
+            } else {
+                //message.reply("Unknown command \"$cmd\")
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package io.github.ehedbor.diskordlin.model
+package io.github.ehedbor.diskordlin.entities
 
 import com.github.salomonbrys.kotson.jsonDeserializer
 import com.github.salomonbrys.kotson.jsonSerializer

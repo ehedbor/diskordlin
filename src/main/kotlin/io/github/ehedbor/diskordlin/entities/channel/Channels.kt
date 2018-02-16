@@ -1,9 +1,8 @@
-package io.github.ehedbor.diskordlin.model.chat
+package io.github.ehedbor.diskordlin.entities.channel
 
 import com.google.gson.annotations.SerializedName
-import io.github.ehedbor.diskordlin.model.Snowflake
-import io.github.ehedbor.diskordlin.model.user.Overwrite
-import io.github.ehedbor.diskordlin.model.user.User
+import io.github.ehedbor.diskordlin.entities.Snowflake
+import io.github.ehedbor.diskordlin.entities.user.User
 
 data class Channel(
     val id: Snowflake,

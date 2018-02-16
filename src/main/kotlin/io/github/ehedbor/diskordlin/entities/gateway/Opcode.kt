@@ -1,4 +1,4 @@
-package io.github.ehedbor.diskordlin.model.gateway
+package io.github.ehedbor.diskordlin.entities.gateway
 
 object Opcode {
     const val DISPATCH = 0

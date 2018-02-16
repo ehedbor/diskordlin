@@ -3,7 +3,7 @@ package unittests
 import com.github.salomonbrys.kotson.fromJson
 import com.github.salomonbrys.kotson.registerTypeAdapter
 import com.google.gson.GsonBuilder
-import io.github.ehedbor.diskordlin.model.Snowflake
+import io.github.ehedbor.diskordlin.entities.Snowflake
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.specs.StringSpec
 

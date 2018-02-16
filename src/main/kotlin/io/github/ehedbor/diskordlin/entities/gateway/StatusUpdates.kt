@@ -1,6 +1,6 @@
-package io.github.ehedbor.diskordlin.model.gateway
+package io.github.ehedbor.diskordlin.entities.gateway
 
-import io.github.ehedbor.diskordlin.model.user.Activity
+import io.github.ehedbor.diskordlin.entities.user.Activity
 
 data class StatusUpdate(
     val since: Long? = null,

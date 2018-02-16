@@ -1,8 +1,10 @@
-package io.github.ehedbor.diskordlin.model.chat
+package io.github.ehedbor.diskordlin.entities.guild
 
 import com.google.gson.annotations.SerializedName
-import io.github.ehedbor.diskordlin.model.Snowflake
-import io.github.ehedbor.diskordlin.model.user.Role
+import io.github.ehedbor.diskordlin.entities.Snowflake
+import io.github.ehedbor.diskordlin.entities.channel.Channel
+import io.github.ehedbor.diskordlin.entities.channel.Emoji
+import io.github.ehedbor.diskordlin.entities.user.Role
 
 data class Guild(
     val id: Snowflake,

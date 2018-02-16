@@ -1,4 +1,4 @@
-package io.github.ehedbor.diskordlin.model.gateway
+package io.github.ehedbor.diskordlin.entities.gateway
 
 import com.github.salomonbrys.kotson.fromJson
 import com.github.salomonbrys.kotson.registerTypeAdapter
@@ -7,7 +7,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
-import io.github.ehedbor.diskordlin.model.Snowflake
+import io.github.ehedbor.diskordlin.entities.Snowflake
 
 /**
  * The payload that is sent over the Discord gateway.

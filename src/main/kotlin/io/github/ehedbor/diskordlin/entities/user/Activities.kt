@@ -1,7 +1,7 @@
-package io.github.ehedbor.diskordlin.model.user
+package io.github.ehedbor.diskordlin.entities.user
 
 import com.google.gson.annotations.SerializedName
-import io.github.ehedbor.diskordlin.model.Snowflake
+import io.github.ehedbor.diskordlin.entities.Snowflake
 
 data class Activity(
     val name: String,

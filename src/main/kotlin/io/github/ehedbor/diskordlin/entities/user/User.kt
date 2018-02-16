@@ -1,14 +1,15 @@
-package io.github.ehedbor.diskordlin.model.user
+package io.github.ehedbor.diskordlin.entities.user
 
 import com.google.gson.annotations.SerializedName
-import io.github.ehedbor.diskordlin.model.Snowflake
+import io.github.ehedbor.diskordlin.entities.Snowflake
 
 data class User(
     var id: Snowflake,
     var username: String,
     var discriminator: String,
     var avatar: String? = null,
-    var bot: Boolean? = null,
+    @SerializedName("bot")
+    var isBot: Boolean? = null,
     @SerializedName("mfa_enabled")
     var mfaEnabled: Boolean? = null,
     var verified: Boolean? = null,

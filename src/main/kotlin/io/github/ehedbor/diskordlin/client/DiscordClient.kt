@@ -1,19 +1,24 @@
 package io.github.ehedbor.diskordlin.client
 
 import com.github.salomonbrys.kotson.fromJson
+import com.github.salomonbrys.kotson.registerTypeAdapter
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import io.github.ehedbor.diskordlin.Diskordlin.LOGGER
+import io.github.ehedbor.diskordlin.entities.Snowflake
+import io.github.ehedbor.diskordlin.entities.channel.Channel
+import io.github.ehedbor.diskordlin.entities.channel.Message
+import io.github.ehedbor.diskordlin.entities.gateway.*
+import io.github.ehedbor.diskordlin.entities.gateway.event.ReadyEvent
+import io.github.ehedbor.diskordlin.entities.guild.UnavailableGuild
+import io.github.ehedbor.diskordlin.entities.user.Activity
+import io.github.ehedbor.diskordlin.entities.user.ActivityType
+import io.github.ehedbor.diskordlin.entities.user.User
 import io.github.ehedbor.diskordlin.event.Events
-import io.github.ehedbor.diskordlin.model.chat.Channel
-import io.github.ehedbor.diskordlin.model.chat.Message
-import io.github.ehedbor.diskordlin.model.chat.UnavailableGuild
-import io.github.ehedbor.diskordlin.model.gateway.*
-import io.github.ehedbor.diskordlin.model.gateway.event.ReadyEvent
-import io.github.ehedbor.diskordlin.model.user.Activity
-import io.github.ehedbor.diskordlin.model.user.ActivityType
-import io.github.ehedbor.diskordlin.model.user.User
 import io.github.ehedbor.diskordlin.util.decompressZLib
+import io.github.ehedbor.diskordlin.util.error
+import io.github.ehedbor.diskordlin.util.info
+import io.github.ehedbor.diskordlin.util.trace
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.newSingleThreadContext
@@ -45,8 +50,8 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Called when a connection is started.
      */
     @OnOpen
-    internal fun onConnectionOpened(session: Session) {
-        LOGGER.info("Opening websocket connection.")
+    fun onConnectionOpened(session: Session) {
+        info("Opening websocket connection.")
         this.session = session
     }
 
@@ -54,8 +59,8 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Called when a connection is closed.
      */
     @OnClose
-    internal fun onConnectionClosed(closeReason: CloseReason) {
-        LOGGER.info("Closing websocket connection: $closeReason")
+    fun onConnectionClosed(closeReason: CloseReason) {
+        info("Closing websocket connection: $closeReason")
         session.close(closeReason)
     }
 
@@ -63,15 +68,16 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Called when a [message] is received over the websocket.
      */
     @OnMessage
-    internal fun onMessageReceived(message: String) {
+    fun onMessageReceived(message: String) {
         val payload = Gson().fromJson<Payload>(message)
 
         if (payload.opcode == Opcode.DISPATCH)
-            LOGGER.info("Received event (${payload.eventName}).")
+            info("Received event (${payload.eventName}).")
         else
-            LOGGER.info("Received message (${Opcode.nameOf(payload.opcode)}).")
+            info("Received message (${Opcode.nameOf(payload.opcode)}).")
 
         when (payload.opcode) {
+            Opcode.DISPATCH -> handleDispatch(payload)
             Opcode.HELLO -> {
                 val data = payload.getDataAs<HelloPayload>()!!
                 val interval = data.heartbeatInterval
@@ -79,11 +85,10 @@ internal class DiscordClient(val token: String, endpointUri: String) {
             }
             Opcode.HEARTBEAT_ACK -> {
                 if (!hasIdentified) {
-                    this.identify()
+                    this.sendIdentify()
                     hasIdentified = true
                 }
             }
-            Opcode.DISPATCH -> handleDispatch(payload)
         }
     }
 
@@ -91,25 +96,29 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Called when a compressed [message] is received.
      */
     @OnMessage
-    internal fun onBinaryMessageReceived(message: ByteArray)= onMessageReceived(decompressZLib(message))
+    fun onBinaryMessageReceived(message: ByteArray)= onMessageReceived(decompressZLib(message))
 
     /**
      * Called when a [throwable] is thrown.
      */
     @OnError
-    internal fun onError(throwable: Throwable) {
-        LOGGER.error("An error occurred: ${throwable.message}", throwable)
+    fun onError(throwable: Throwable) {
+        error("An error occurred: ${throwable.message}", throwable)
     }
 
-    /**
-     * Sends a [message] asynchronously.
-     */
-    internal fun sendMessageAsync(message: String)= session.asyncRemote.sendText(message)
+    fun sendMessage(message: String) = session.basicRemote.sendText(message)
 
-    /**
-     * Sends a [message] (blocking).
-     */
-    internal fun sendMessage(message: String) = session.basicRemote.sendText(message)
+    fun sendMessage(payload: Payload) {
+        val gson = GsonBuilder()
+            .registerTypeAdapter(Snowflake.serializer)
+            .serializeNulls()
+            .create()
+        sendMessage(gson.toJson(payload))
+    }
+
+    fun sendMessageAsync(message: String)= async { sendMessage(message) }
+
+    fun sendMessageAsync(payload: Payload) = async { sendMessage(payload) }
 
     /**
      * Handles [Opcode.DISPATCH].
@@ -129,16 +138,17 @@ internal class DiscordClient(val token: String, endpointUri: String) {
                 Events.messageCreate(msg)
             }
             else -> {
-                LOGGER.trace("Unhandled event type \"${payload.eventName}\"")
+                trace("Unhandled event type \"${payload.eventName}\"")
             }
         }
     }
 
     /**
-     * Sends an identify payload.
+     * Sends the identify payload.
      */
-    private fun identify() {
-        LOGGER.info("Sending identify payload.")
+    private fun sendIdentify() {
+        info("Sending identify payload.")
+
         // TODO don't hardcode the identify properties
         val identifyPayload = IdentifyPayload(
             token = token,
@@ -148,7 +158,9 @@ internal class DiscordClient(val token: String, endpointUri: String) {
                 device = "diskordlin"
             ),
             compress = false,
-            largeThreshold = 100,
+            largeThreshold = 250,
+            //TODO change this if sharding is added
+            // Shard id 0, number of shards = 1
             shard = listOf(0, 1),
             presence = StatusUpdate(
                 since = null,
@@ -168,7 +180,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Starts sending heartbeats at the specified [interval].
      */
     private fun startHeartbeat(interval: Long) {
-        LOGGER.info("Starting heartbeat.")
+        info("Starting heartbeat.")
         val ctx = newSingleThreadContext("Heartbeat")
         launch(ctx) {
             while (true) {
@@ -182,7 +194,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Sends a heartbeat.
      */
     private fun sendHeartbeat() {
-        LOGGER.info("Sending heartbeat!")
+        info("Sending heartbeat!")
 
         val msg = Payload(Opcode.HEARTBEAT)
         val gson = GsonBuilder()

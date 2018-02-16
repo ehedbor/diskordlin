@@ -3,7 +3,7 @@ package unittests
 import com.github.salomonbrys.kotson.fromJson
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
-import io.github.ehedbor.diskordlin.model.user.User
+import io.github.ehedbor.diskordlin.entities.user.User
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldThrow
 import io.kotlintest.specs.StringSpec
