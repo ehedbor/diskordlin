@@ -5,8 +5,7 @@ import com.github.kittinunf.fuel.httpGet
 import io.github.ehedbor.diskordlin.client.ClientType
 import io.github.ehedbor.diskordlin.client.DiscordClient
 import io.github.ehedbor.diskordlin.entities.gateway.GatewayBotResponse
-import io.github.ehedbor.diskordlin.util.fatal
-import io.github.ehedbor.diskordlin.util.info
+import io.github.ehedbor.diskordlin.util.Logger
 import kotlinx.coroutines.experimental.async
 
 /**
@@ -15,17 +14,7 @@ import kotlinx.coroutines.experimental.async
 @Suppress("MemberVisibilityCanBePrivate")
 class Diskordlin constructor(val token: String, val clientType: ClientType) {
 
-    private var _client: DiscordClient? = null
-    internal var client: DiscordClient
-        get() {
-            if (_client == null) {
-                throw IllegalStateException("Must log in before accessing client!")
-            }
-            return _client!!
-        }
-        private set(value) {
-            _client = value
-        }
+    internal lateinit var client: DiscordClient
 
     /**
      * Starts to log a [DiscordClient] into the Discord gateway API.
@@ -74,7 +63,7 @@ class Diskordlin constructor(val token: String, val clientType: ClientType) {
         )
     }
 
-    companion object {
+    companion object : Logger {
         /** The Discord API version. */
         const val API_VERSION = "6"
 
@@ -90,7 +79,9 @@ class Diskordlin constructor(val token: String, val clientType: ClientType) {
         const val API = "https://discordapp.com/api/v$API_VERSION"
 
         @JvmStatic
-        internal val HTTP_USER_AGENT = "User-Agent" to "diskordlin (https://github.com/ehedbor/diskordlin, 1.0-SNAPSHOT)"
+        internal val HTTP_USER_AGENT by lazy {
+            "User-Agent" to "${BuildInfo.name} (${BuildInfo.url}, ${BuildInfo.version})"
+        }
     }
 }
 

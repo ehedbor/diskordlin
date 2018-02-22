@@ -2,7 +2,9 @@ package io.github.ehedbor.diskordlin.entities.user
 
 import com.google.gson.annotations.SerializedName
 import io.github.ehedbor.diskordlin.entities.Snowflake
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class User(
     var id: Snowflake,
     var username: String,
@@ -14,4 +16,7 @@ data class User(
     var mfaEnabled: Boolean? = null,
     var verified: Boolean? = null,
     var email: String? = null
-)
+) {
+
+    override fun toString() = username
+}

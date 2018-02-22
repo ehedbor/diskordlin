@@ -14,10 +14,8 @@ import io.github.ehedbor.diskordlin.entities.user.Activity
 import io.github.ehedbor.diskordlin.entities.user.ActivityType
 import io.github.ehedbor.diskordlin.entities.user.User
 import io.github.ehedbor.diskordlin.event.Events
+import io.github.ehedbor.diskordlin.util.Logger
 import io.github.ehedbor.diskordlin.util.decompressZLib
-import io.github.ehedbor.diskordlin.util.error
-import io.github.ehedbor.diskordlin.util.info
-import io.github.ehedbor.diskordlin.util.trace
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
@@ -40,6 +38,8 @@ internal class DiscordClient(val token: String, endpointUri: String) {
     private var dmChannels: List<Channel>? = null
     private var joinedGuilds: List<UnavailableGuild>? = null
     private var sessionId: String? = null
+
+    companion object : Logger
 
     init {
         val container = ContainerProvider.getWebSocketContainer()

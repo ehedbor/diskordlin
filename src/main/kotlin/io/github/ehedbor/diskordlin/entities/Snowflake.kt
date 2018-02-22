@@ -3,6 +3,7 @@ package io.github.ehedbor.diskordlin.entities
 import com.github.salomonbrys.kotson.jsonDeserializer
 import com.github.salomonbrys.kotson.jsonSerializer
 import com.github.salomonbrys.kotson.toJson
+import kotlinx.serialization.*
 import java.math.BigInteger
 import java.util.*
 
@@ -10,9 +11,12 @@ import java.util.*
  * A type of UUID used by Discord and [Twitter][https://github.com/twitter/snowflake/tree/snowflake-2010].
  */
 @Suppress("MemberVisibilityCanBePrivate")
-data class Snowflake(val rawData: String) {
+@Serializable
+data class Snowflake(private val rawData: String) {
 
-    companion object {
+    @Serializer(forClass = Snowflake::class)
+    companion object : KSerializer<Snowflake> {
+
         /**
          * The first second of 2015 in Unix time.
          */
@@ -20,6 +24,10 @@ data class Snowflake(val rawData: String) {
 
         val serializer get() = jsonSerializer<Snowflake> { it.src.rawData.toJson() }
         val deserializer get() = jsonDeserializer { Snowflake(it.json.asString) }
+
+        override fun load(input: KInput) = Snowflake(input.readStringValue())
+
+        override fun save(output: KOutput, obj: Snowflake) = output.writeStringValue("$obj")
     }
 
     private val value = rawData.toBigInteger()
