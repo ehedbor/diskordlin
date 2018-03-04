@@ -1,22 +1,22 @@
 package io.github.ehedbor.diskordlin.entities.gateway
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Optional
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName as Name
 
+@Serializable
 data class IdentifyPayload(
     val token: String,
     val properties: IdentifyProperties,
     val compress: Boolean,
-    @SerializedName("large_threshold")
-    val largeThreshold: Int,
-    val shard: List<Int> = emptyList(),
+    @Name("large_threshold")  val largeThreshold: Int,
+    @Optional val shard: List<Int> = emptyList(),
     val presence: StatusUpdate
 )
 
+@Serializable
 data class IdentifyProperties(
-    @SerializedName("\$os")
-    val os: String,
-    @SerializedName("\$browser")
-    val browser: String,
-    @SerializedName("\$device")
-    val device: String
+    @Name("\$os") val os: String,
+    @Name("\$browser") val browser: String,
+    @Name("\$device")  val device: String
 )

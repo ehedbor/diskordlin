@@ -1,10 +1,11 @@
 package io.github.ehedbor.diskordlin.entities.gateway
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Optional
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName as Name
 
+@Serializable
 data class HeartbeatPayload(
-    @SerializedName("op")
-    val opcode: Int? = null,
-    @SerializedName("d")
-    val lastSequenceNumber: Int? = null
+    @Optional @Name("op") val opcode: Int? = null,
+    @Optional @Name("d") val lastSequenceNumber: Int? = null
 )

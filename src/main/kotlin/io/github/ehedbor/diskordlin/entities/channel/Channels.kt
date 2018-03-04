@@ -1,35 +1,30 @@
 package io.github.ehedbor.diskordlin.entities.channel
 
-import com.google.gson.annotations.SerializedName
 import io.github.ehedbor.diskordlin.entities.Snowflake
 import io.github.ehedbor.diskordlin.entities.user.User
+import kotlinx.serialization.Optional
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName as Name
 
+@Serializable
 data class Channel(
     val id: Snowflake,
     val type: Int,
-    @SerializedName("guild_id")
-    val guildId: Snowflake? = null,
-    val position: Int? = null,
-    @SerializedName("permission_overwrites")
-    val permissionOverwrites: List<Overwrite> = emptyList(),
-    val name: String? = null,
-    val topic: String? = null,
-    val nsfw: Boolean? = null,
-    @SerializedName("last_message_id")
-    val lastMessageId: Snowflake? = null,
-    val bitrate: Long? = null,
-    @SerializedName("user_limit")
-    val userLimit: Int? = null,
-    val recipients: List<User> = emptyList(),
-    val icon: String? = null,
-    @SerializedName("owner_id")
-    val ownerId: Snowflake? = null,
-    @SerializedName("application_id")
-    val applicationId: Snowflake? = null,
-    @SerializedName("parent_id")
-    val parentId: Snowflake? = null,
-    @SerializedName("last_pin_timestamp")
-    val lastPinTimestamp: String? = null
+    @Optional @Name("guild_id") val guildId: Snowflake? = null,
+    @Optional val position: Int? = null,
+    @Optional @Name("permission_overwrites") val permissionOverwrites: List<Overwrite> = emptyList(),
+    @Optional val name: String? = null,
+    @Optional val topic: String? = null,
+    @Optional val nsfw: Boolean? = null,
+    @Optional @Name("last_message_id") val lastMessageId: Snowflake? = null,
+    @Optional val bitrate: Long? = null,
+    @Optional @Name("user_limit") val userLimit: Int? = null,
+    @Optional val recipients: List<User> = emptyList(),
+    @Optional val icon: String? = null,
+    @Optional @Name("owner_id") val ownerId: Snowflake? = null,
+    @Optional @Name("application_id") val applicationId: Snowflake? = null,
+    @Optional  @Name("parent_id") val parentId: Snowflake? = null,
+    @Optional @Name("last_pin_timestamp") val lastPinTimestamp: String? = null
 )
 
 object ChannelType {

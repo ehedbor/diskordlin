@@ -1,19 +1,21 @@
 package io.github.ehedbor.diskordlin.entities.user
 
-import com.google.gson.annotations.SerializedName
 import io.github.ehedbor.diskordlin.entities.Snowflake
+import kotlinx.serialization.Optional
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName as Name
 
+@Serializable
 data class Activity(
     val name: String,
     val type: Int,
-    val url: String? = null,
-    val timestamps: Timestamps? = null,
-    @SerializedName("application_id")
-    val applicationId: Snowflake? = null,
-    val details: String? = null,
-    val state: String? = null,
-    val party: Party? = null,
-    val assets: Assets? = null
+    @Optional val url: String? = null,
+    @Optional val timestamps: Timestamps? = null,
+    @Optional @Name("application_id") val applicationId: Snowflake? = null,
+    @Optional val details: String? = null,
+    @Optional val state: String? = null,
+    @Optional val party: Party? = null,
+    @Optional val assets: Assets? = null
 )
 
 object ActivityType {
@@ -22,17 +24,22 @@ object ActivityType {
     const val LISTENING = 2
 }
 
-data class Timestamps(val start: Long? = null, val end: Long? = null)
+@Serializable
+data class Timestamps(
+    @Optional val start: Long? = null,
+    @Optional val end: Long? = null
+)
 
-data class Party(val id: Snowflake? = null, val size: List<Int> = listOf())
+@Serializable
+data class Party(
+    @Optional val id: Snowflake? = null,
+    @Optional val size: List<Int> = listOf()
+)
 
+@Serializable
 data class Assets(
-    @SerializedName("large_image")
-    val largeImage: String? = null,
-    @SerializedName("large_text")
-    val largeText: String? = null,
-    @SerializedName("small_image")
-    val smallImage: String? = null,
-    @SerializedName("small_text")
-    val smallText: String? = null
+    @Optional @Name("large_image") val largeImage: String? = null,
+    @Optional @Name("large_text")  val largeText: String? = null,
+    @Optional @Name("small_image") val smallImage: String? = null,
+    @Optional @Name("small_text")  val smallText: String? = null
 )

@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Properties
 
 buildscript {
-    extra["kotlinVersion"] = "1.2.21"
+    extra["kotlinVersion"] = "1.2.10"
     extra["kotlinxCoroutinesVersion"] = "0.21.1"
     extra["kotlinSerializationVersion"] = "0.4.1"
 
@@ -38,12 +38,13 @@ allprojects {
 
 plugins {
     base
-    kotlin("jvm") version "1.2.21"
+    kotlin("jvm") version "1.2.10"
 }
 
 apply {
     plugin("kotlin")
-    plugin("kotlinx-serialization")
+    // For some reason the compiler doesn't like this plugin
+    //plugin("kotlinx-serialization")
 }
 
 kotlin {
@@ -61,9 +62,9 @@ dependencies {
     compile(kotlinx("coroutines-core", extra["kotlinxCoroutinesVersion"].toString()))
     compile(kotlinx("serialization-runtime", extra["kotlinSerializationVersion"].toString()))
     compile("org.glassfish.tyrus.bundles:tyrus-standalone-client-jdk:${extra["tyrusVersion"]}")
-    compile("com.github.salomonbrys.kotson:kotson:${extra["kotsonVersion"]}")
+    //compile("com.github.salomonbrys.kotson:kotson:${extra["kotsonVersion"]}")
     compile("com.github.kittinunf.fuel:fuel:${extra["fuelVersion"]}")
-    compile("com.github.kittinunf.fuel:fuel-gson:${extra["fuelVersion"]}")
+    //compile("com.github.kittinunf.fuel:fuel-gson:${extra["fuelVersion"]}")
     compile("org.slf4j:slf4j-api:${extra["slf4jVersion"]}")
     compile("io.github.microutils:kotlin-logging:${extra["kotlinLoggingVersion"]}")
 

@@ -1,17 +1,19 @@
 package io.github.ehedbor.diskordlin.entities.channel
 
-import com.google.gson.annotations.SerializedName
 import io.github.ehedbor.diskordlin.entities.user.Role
 import io.github.ehedbor.diskordlin.entities.user.User
+import kotlinx.serialization.Optional
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName as Name
 
 @Suppress("MemberVisibilityCanPrivate")
+@Serializable
 data class Emoji(
-    val id: String? = null,
+    @Optional val id: String? = null,
     val name: String,
-    val roles: List<Role> = emptyList(),
-    val user: User? = null,
-    @SerializedName("require_colons")
-    val requireColons: Boolean? = null,
-    val managed: Boolean? = null,
-    val animated: Boolean? = null
+    @Optional val roles: List<Role> = emptyList(),
+    @Optional val user: User? = null,
+    @Optional @Name("require_colons") val requireColons: Boolean? = null,
+    @Optional val managed: Boolean? = null,
+    @Optional val animated: Boolean? = null
 )

@@ -1,11 +1,11 @@
 package io.github.ehedbor.diskordlin
 
-import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpGet
 import io.github.ehedbor.diskordlin.client.ClientType
 import io.github.ehedbor.diskordlin.client.DiscordClient
 import io.github.ehedbor.diskordlin.entities.gateway.GatewayBotResponse
 import io.github.ehedbor.diskordlin.util.Logger
+import io.github.ehedbor.diskordlin.util.responseObject
 import kotlinx.coroutines.experimental.async
 
 /**
@@ -29,9 +29,6 @@ class Diskordlin constructor(val token: String, val clientType: ClientType) {
 
     /**
      * Logs a [DiscordClient] into the Discord gateway API.
-     *
-     * @param token The authentication token.
-     * @param clientType The type of client logging in.
      */
     fun login() {
         require(clientType == ClientType.BOT) { "Only bot clients are supported right now, sorry!" }
@@ -40,7 +37,7 @@ class Diskordlin constructor(val token: String, val clientType: ClientType) {
         // add encoding and version info
         val url = "${response.url}/?encoding=json&v=$WEBSOCKET_API_VERSION"
         // create the client endpoint
-        val client = DiscordClient(token, url)
+        client = DiscordClient(token, url)
 
         info("Successfully logged in!")
     }

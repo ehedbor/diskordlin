@@ -1,10 +1,5 @@
 package io.github.ehedbor.diskordlin.client
 
-import com.github.salomonbrys.kotson.fromJson
-import com.github.salomonbrys.kotson.registerTypeAdapter
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import io.github.ehedbor.diskordlin.entities.Snowflake
 import io.github.ehedbor.diskordlin.entities.channel.Channel
 import io.github.ehedbor.diskordlin.entities.channel.Message
 import io.github.ehedbor.diskordlin.entities.gateway.*
@@ -20,6 +15,7 @@ import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.newSingleThreadContext
+import kotlinx.serialization.json.JSON
 import java.net.URI
 import java.util.concurrent.TimeUnit
 import javax.websocket.*
@@ -69,7 +65,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      */
     @OnMessage
     fun onMessageReceived(message: String) {
-        val payload = Gson().fromJson<Payload>(message)
+        val payload = JSON.parse<Payload>(message)
 
         if (payload.opcode == Opcode.DISPATCH)
             info("Received event (${payload.eventName}).")
@@ -108,13 +104,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
 
     fun sendMessage(message: String) = session.basicRemote.sendText(message)
 
-    fun sendMessage(payload: Payload) {
-        val gson = GsonBuilder()
-            .registerTypeAdapter(Snowflake.serializer)
-            .serializeNulls()
-            .create()
-        sendMessage(gson.toJson(payload))
-    }
+    fun sendMessage(payload: Payload) =  sendMessage(JSON.stringify(payload))
 
     fun sendMessageAsync(message: String)= async { sendMessage(message) }
 
@@ -173,7 +163,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
             )
         )
         val payload = Payload(Opcode.IDENTIFY, identifyPayload)
-        this.sendMessageAsync(Gson().toJson(payload))
+        this.sendMessageAsync(JSON.stringify(payload))
     }
 
     /**
@@ -197,9 +187,6 @@ internal class DiscordClient(val token: String, endpointUri: String) {
         info("Sending heartbeat!")
 
         val msg = Payload(Opcode.HEARTBEAT)
-        val gson = GsonBuilder()
-            .serializeNulls()
-            .create()
-        this.sendMessage(gson.toJson(msg))
+        this.sendMessage(JSON.stringify(msg))
     }
 }
