@@ -18,9 +18,7 @@
             <array />
           </option>
           <option name="pluginClasspaths">
-            <array>
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-gradle-serialization-plugin/0.4.1/45e8a99dff19a26fbf53a4b8ed858776c279a6f9/kotlinx-gradle-serialization-plugin-0.4.1.jar" />
-            </array>
+            <array />
           </option>
           <option name="coroutinesState" value="enable" />
         </compilerArguments>
@@ -45,8 +43,8 @@
     <orderEntry type="library" name="Gradle: io.kotlintest:kotlintest:2.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.github.kittinunf.result:result:1.2.0" level="project" />
     <orderEntry type="library" name="Gradle: com.sksamuel.koors:koors:0.90.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.2.10" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.21" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.2.30" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.30" level="project" />
     <orderEntry type="library" name="Gradle: org.glassfish.tyrus.bundles:tyrus-standalone-client-jdk:1.13.1" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-slf4j-impl:2.7" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
