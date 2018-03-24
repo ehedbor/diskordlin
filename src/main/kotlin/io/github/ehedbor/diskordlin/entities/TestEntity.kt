@@ -22,14 +22,11 @@
  * SOFTWARE.
  */
 
-package io.github.ehedbor.diskordlin.entities.gateway
+package io.github.ehedbor.diskordlin.entities
 
 import kotlinx.serialization.Optional
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerialName as Name
 
+//TODO remove
 @Serializable
-data class HeartbeatPayload(
-    @Optional @Name("op") val opcode: Int? = null,
-    @Optional @Name("d") val lastSequenceNumber: Int? = null
-)
+data class TestEntity(@Optional val strList: List<String> = emptyList())

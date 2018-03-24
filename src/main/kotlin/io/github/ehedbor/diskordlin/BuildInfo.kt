@@ -39,7 +39,10 @@ object BuildInfo {
         p
     }
 
+    /** The display name of the build */
     val name = properties["name"] as String
+    /** The build version */
     val version = properties["version"] as String
+    /** The build's url. */
     val url = properties["url"] as String
 }

@@ -34,6 +34,10 @@ import kotlinx.coroutines.experimental.async
 
 /**
  * The main Diskordlin API.
+ *
+ * @constructor Constructs an API object.
+ * @param token The user's API token. Discord uses this to connect to the API!
+ * @param clientType The type of client connecting.
  */
 @Suppress("MemberVisibilityCanBePrivate")
 class Diskordlin constructor(val token: String, val clientType: ClientType) {
@@ -74,7 +78,7 @@ class Diskordlin constructor(val token: String, val clientType: ClientType) {
             .header(HTTP_USER_AGENT)
             .header("Authorization" to "Bot $token")
             .responseObject<GatewayBotResponse>()
-
+        
         result.fold(
             success = { return it },
             failure = {

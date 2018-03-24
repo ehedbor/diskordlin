@@ -24,10 +24,10 @@
 
 package io.github.ehedbor.diskordlin.entities.gateway
 
-import kotlinx.serialization.Optional
+import com.beust.klaxon.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.SerialName as Name
+import kotlin.reflect.KClass
+import kotlin.reflect.full.safeCast
 
 /**
  * The payload that is sent over the Discord gateway.
@@ -40,21 +40,61 @@ import kotlinx.serialization.SerialName as Name
  */
 @Suppress("MemberVisibilityCanBePrivate")
 @Serializable
-data class Payload @JvmOverloads constructor(
-    @Name("op") val opcode: Int,
-    @Optional @Name("d") val data: String? = null,
-    @Optional @Name("s") val sequenceNumber: Int? = null,
-    @Optional @Name("t") val eventName: String? = null
+data class Payload(
+    @Json(name="op") val opcode: Int,
+    @Json(name="d") val data: JsonObject? = null,
+    @Json(name="s") val sequenceNumber: Int? = null,
+    @Json(name="t") val eventName: String? = null
 ) {
 
-    /**
-     * Constructs a [Payload] object by stringifying the [data] and calling the primary constructor.
-     */
-    constructor(opcode: Int, data: Any, sequenceNumber: Int? = null, eventName: String? = null)
-        : this(opcode, JSON.stringify(data) as String?, sequenceNumber, eventName)
+    var parsedData: Any? = null
+        private set
+
+    constructor(opcode: Int, innerPayload: Any?, sequenceNumber: Int? = null, eventName: String? = null)
+        : this(
+        opcode = opcode,
+        data = null,
+        sequenceNumber = sequenceNumber,
+        eventName = eventName) {
+        parsedData = innerPayload
+    }
+
+    companion object : Converter<Payload> {
+        override fun fromJson(jv: JsonValue): Payload {
+            val opcode = jv.obj?.int("op")
+            val data = jv.obj?.obj("d")
+            val sequenceNumber = jv.obj?.int("s")
+            val eventName = jv.obj?.string("eventName")
+
+            requireNotNull(opcode) { "Opcode must be present!" }
+            return Payload(opcode!!, data, sequenceNumber, eventName)
+        }
+
+        override fun toJson(value: Payload): String? {
+            TODO("Not implemented")
+        }
+    }
 
     /**
-     * Parses the [data] as the given type [T] using [Gson].
+     * Parses the [data] as the given type [T].
      */
-    inline fun <reified T : Any> getDataAs() = if (data == null) null else JSON.parse<T>(data)
+    inline fun <reified T : Any> getDataAs() = getDataAs(T::class)
+
+    /**
+     * Parses the [data] as the given [type].
+     */
+    fun <T : Any> getDataAs(type: KClass<T>): T? {
+        return if (parsedData == null) {
+            if (data == null) {
+                null
+            } else {
+                // Cache the parsed value once it is created
+                val obj = type.safeCast(Klaxon().fromJsonObject(data, type.java, type))
+                parsedData = obj
+                obj
+            }
+        } else {
+            type.safeCast(parsedData)
+        }
+    }
 }

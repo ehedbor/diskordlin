@@ -25,14 +25,11 @@
 package io.github.ehedbor.diskordlin.client
 
 import io.github.ehedbor.diskordlin.entities.channel.Channel
-import io.github.ehedbor.diskordlin.entities.channel.Message
 import io.github.ehedbor.diskordlin.entities.gateway.*
-import io.github.ehedbor.diskordlin.entities.gateway.event.ReadyEvent
 import io.github.ehedbor.diskordlin.entities.guild.UnavailableGuild
 import io.github.ehedbor.diskordlin.entities.user.Activity
 import io.github.ehedbor.diskordlin.entities.user.ActivityType
 import io.github.ehedbor.diskordlin.entities.user.User
-import io.github.ehedbor.diskordlin.event.Events
 import io.github.ehedbor.diskordlin.util.Logger
 import io.github.ehedbor.diskordlin.util.decompressZLib
 import kotlinx.coroutines.experimental.async
@@ -99,9 +96,10 @@ internal class DiscordClient(val token: String, endpointUri: String) {
         when (payload.opcode) {
             Opcode.DISPATCH -> handleDispatch(payload)
             Opcode.HELLO -> {
-                val data = payload.getDataAs<HelloPayload>()!!
-                val interval = data.heartbeatInterval
-                this.startHeartbeat(interval)
+                // TODO fix this code
+                //val data = payload.getDataAs<HelloPayload>()!!
+                //val interval = data.heartbeatInterval
+                //this.startHeartbeat(interval)
             }
             Opcode.HEARTBEAT_ACK -> {
                 if (!hasIdentified) {
@@ -140,16 +138,19 @@ internal class DiscordClient(val token: String, endpointUri: String) {
     private fun handleDispatch(payload: Payload) {
         when (payload.eventName) {
             "READY" -> {
-                val data = payload.getDataAs<ReadyEvent>()!!
-                this.userInfo = data.user
-                this.dmChannels = data.privateChannels
-                this.joinedGuilds = data.guilds
-                this.sessionId = data.sessionId
-                Events.ready(data)
+                // TODO fix this too
+//                val data = payload.getDataAs<ReadyEvent>()!!
+//                this.userInfo = data.user
+//                this.dmChannels = data.privateChannels
+//                this.joinedGuilds = data.guilds
+//                this.sessionId = data.sessionId
+                //TODO uncomment this
+                //Events.ready(data)
             }
             "MESSAGE_CREATE" -> {
-                val msg = payload.getDataAs<Message>()!!
-                Events.messageCreate(msg)
+                // TODO uncomment thos
+                //val msg = payload.getDataAs<Message>()!!
+                //Events.messageCreate(msg)
             }
             else -> {
                 trace("Unhandled event type \"${payload.eventName}\"")
@@ -186,8 +187,9 @@ internal class DiscordClient(val token: String, endpointUri: String) {
                 afk = false
             )
         )
-        val payload = Payload(Opcode.IDENTIFY, identifyPayload)
-        this.sendMessageAsync(JSON.stringify(payload))
+        // TODO repair this
+       // val payload = Payload(Opcode.IDENTIFY, identifyPayload)
+        //this.sendMessageAsync(JSON.stringify(payload))
     }
 
     /**
