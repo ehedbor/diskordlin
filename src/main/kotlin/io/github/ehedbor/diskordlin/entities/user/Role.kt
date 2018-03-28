@@ -25,9 +25,7 @@
 package io.github.ehedbor.diskordlin.entities.user
 
 import io.github.ehedbor.diskordlin.entities.Snowflake
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class Role(
     var id: Snowflake,
     var name: String,

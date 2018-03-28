@@ -25,7 +25,6 @@
 package io.github.ehedbor.diskordlin.entities.gateway
 
 import com.beust.klaxon.*
-import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 import kotlin.reflect.full.safeCast
 
@@ -39,12 +38,11 @@ import kotlin.reflect.full.safeCast
  * @property eventName The event name of this [Payload] (only for [Opcode.DISPATCH]).
  */
 @Suppress("MemberVisibilityCanBePrivate")
-@Serializable
 data class Payload(
-    @Json(name="op") val opcode: Int,
-    @Json(name="d") val data: JsonObject? = null,
-    @Json(name="s") val sequenceNumber: Int? = null,
-    @Json(name="t") val eventName: String? = null
+    @Json("op") val opcode: Int,
+    @Json("d") val data: JsonObject? = null,
+    @Json("s") val sequenceNumber: Int? = null,
+    @Json("t") val eventName: String? = null
 ) {
 
     var parsedData: Any? = null

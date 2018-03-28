@@ -24,49 +24,43 @@
 
 package io.github.ehedbor.diskordlin.entities
 
-import kotlinx.serialization.*
+import com.beust.klaxon.Converter
+import com.beust.klaxon.JsonValue
 import java.math.BigInteger
 import java.util.*
 
 /**
- * A type of UUID used by Discord and [Twitter][https://github.com/twitter/snowflake/tree/snowflake-2010].
+ * The unique id format used by Discord and [Twitter][https://github.com/twitter/snowflake/tree/snowflake-2010].
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-@Serializable
-data class Snowflake(private val value: BigInteger) {
+class Snowflake(private val value: BigInteger) {
 
-    @Serializer(forClass = Snowflake::class)
-    companion object {
-
+    companion object : Converter<Snowflake> {
         /**
          * The first second of 2015 in Unix time.
          */
         const val DISCORD_EPOCH = 1_420_070_400_000L
 
-        fun load(input: KInput): Snowflake {
-            val rawData = input.readStringValue()
-            return Snowflake(rawData)
+        override fun fromJson(jv: JsonValue): Snowflake {
+            val str = jv.string ?: throw IllegalArgumentException("Could not convert json to snowflake.")
+            return Snowflake(str)
         }
 
-        fun save(output: KOutput, obj: Snowflake) {
-            output.writeStringValue(obj.value.toString())
-        }
+        override fun toJson(value: Snowflake) = "\"$value\""
     }
 
     constructor(rawData: String) : this(rawData.toBigInteger())
-    constructor(value: Int)      : this(value.toBigInteger())
-    constructor(value: Long)     : this(value.toBigInteger())
 
     /** The timestamp in Unix time */
-    @Transient val timestamp: Long = (value shr 22).toLong() + DISCORD_EPOCH
-    @Transient val internalWorkerId: Int = (value and 0x3E0000.toBigInteger() shr 17).toInt()
-    @Transient val internalProcessId: Int = (value and 0x1F000.toBigInteger() shr 12).toInt()
-    @Transient val increment: Int = (value and 0xFFF.toBigInteger()).toInt()
+    val timestamp: Long = (value shr 22).toLong() + DISCORD_EPOCH
+    val internalWorkerId: Int = (value and 0x3E0000.toBigInteger() shr 17).toInt()
+    val internalProcessId: Int = (value and 0x1F000.toBigInteger() shr 12).toInt()
+    val increment: Int = (value and 0xFFF.toBigInteger()).toInt()
 
     /** The date represented by the timestamp */
-    @Transient val date = Date(timestamp)
+    val date = Date(timestamp)
 
-    override fun toString() = value.toString()
+    override fun toString() = "$value"
 
     override fun equals(other: Any?) = (other as? Snowflake)?.value == this.value
 

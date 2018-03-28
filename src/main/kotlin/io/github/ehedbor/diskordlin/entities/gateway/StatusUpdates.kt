@@ -25,13 +25,10 @@
 package io.github.ehedbor.diskordlin.entities.gateway
 
 import io.github.ehedbor.diskordlin.entities.user.Activity
-import kotlinx.serialization.Optional
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class StatusUpdate(
-    @Optional val since: Long? = null,
-    @Optional val game: Activity? = null,
+    val since: Long? = null,
+    val game: Activity? = null,
     val status: String,
     val afk: Boolean
 )

@@ -24,12 +24,10 @@
 
 package io.github.ehedbor.diskordlin.entities.channel
 
+import com.beust.klaxon.Json
 import io.github.ehedbor.diskordlin.entities.Snowflake
 import io.github.ehedbor.diskordlin.entities.user.Role
 import io.github.ehedbor.diskordlin.entities.user.User
-import kotlinx.serialization.Optional
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerialName as Name
 
 /**
  * A message sent over the Discord API.
@@ -37,24 +35,23 @@ import kotlinx.serialization.SerialName as Name
  * @param id The message 
  */
 @Suppress("MemberVisibilityCanPrivate")
-@Serializable
 data class Message(
     val id: Snowflake,
-    @Name("channel_id") val channelId: Snowflake,
+    @Json("channel_id") val channelId: Snowflake,
     val author: User,
     val content: String,
     val timestamp: String,
-    @Optional @Name("edited_timestamp") val editedTimestamp: String? = null,
-    @Optional val tts: Boolean = false,
-    @Optional @Name("mention_everyone") val mentionEveryone: Boolean = false,
-    @Optional val mentions: List<User> = emptyList(),
-    @Optional @Name("mention_roles") val mentionRoles: List<Role> = emptyList(),
-    @Optional val attachments: List<Attachment> = emptyList(),
-    @Optional val embeds: List<Embed> = emptyList(),
-    @Optional val reactions: List<Reaction> = emptyList(),
-    @Optional val nonce: Snowflake? = null,
-    @Optional val pinned: Boolean = false,
-    @Optional @Name("webhook_id") val webhookId: Snowflake? = null,
+    @Json("edited_timestamp") val editedTimestamp: String? = null,
+    val tts: Boolean = false,
+    @Json("mention_everyone") val mentionEveryone: Boolean = false,
+    val mentions: List<User> = emptyList(),
+    @Json("mention_roles") val mentionRoles: List<Role> = emptyList(),
+    val attachments: List<Attachment> = emptyList(),
+    val embeds: List<Embed> = emptyList(),
+    val reactions: List<Reaction> = emptyList(),
+    val nonce: Snowflake? = null,
+    val pinned: Boolean = false,
+    @Json("webhook_id") val webhookId: Snowflake? = null,
     val type: Int
 )
 

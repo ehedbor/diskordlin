@@ -27,117 +27,25 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.JsonValue
 import com.beust.klaxon.Klaxon
 import io.github.ehedbor.diskordlin.entities.Snowflake
-import io.github.ehedbor.diskordlin.entities.TestEntity
 import io.github.ehedbor.diskordlin.entities.gateway.IdentifyPayload
 import io.github.ehedbor.diskordlin.entities.gateway.Opcode
 import io.github.ehedbor.diskordlin.entities.gateway.Payload
 import io.github.ehedbor.diskordlin.entities.user.User
+import io.github.ehedbor.diskordlin.util.withDefaultConverters
 import io.kotlintest.matchers.shouldEqual
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.specs.StringSpec
-import kotlinx.serialization.*
-import kotlinx.serialization.internal.SerialClassDescImpl
-import kotlinx.serialization.json.JSON
 import java.io.StringReader
-import java.math.BigInteger
-import java.util.*
-
-@Serializable
-data class SimpleDataClass(var myProperty: String)
-
-// Literally just a copy of Snowflake
-@Serializable
-data class SnowflakeCopy(private val value: BigInteger) {
-
-    @Serializer(forClass = SnowflakeCopy::class)
-    companion object : KSerializer<SnowflakeCopy> {
-
-        /**
-         * The first second of 2015 in Unix time.
-         */
-        const val DISCORD_EPOCH = 1_420_070_400_000L
-
-        override fun load(input: KInput): SnowflakeCopy {
-            val rawData = input.readStringValue()
-            return SnowflakeCopy(rawData)
-        }
-
-        override fun save(output: KOutput, obj: SnowflakeCopy) {
-            output.writeStringValue(obj.value.toString())
-        }
-
-        override val serialClassDesc: KSerialClassDesc
-            = SerialClassDescImpl("io.github.ehedbor.diskordlin.entities.SnowflakeCopy")
-    }
-
-    constructor(rawData: String) : this(rawData.toBigInteger())
-    constructor(value: Int)      : this(value.toBigInteger())
-    constructor(value: Long)     : this(value.toBigInteger())
-
-    /** The timestamp in Unix time */
-    @Transient val timestamp: Long = (value shr 22).toLong() + DISCORD_EPOCH
-    @Transient val internalWorkerId: Int = (value and 0x3E0000.toBigInteger() shr 17).toInt()
-    @Transient val internalProcessId: Int = (value and 0x1F000.toBigInteger() shr 12).toInt()
-    @Transient val increment: Int = (value and 0xFFF.toBigInteger()).toInt()
-
-    /** The date represented by the timestamp */
-    @Transient val date = Date(timestamp)
-
-    override fun toString() = value.toString()
-
-    override fun equals(other: Any?) = (other as? SnowflakeCopy)?.value == this.value
-
-    override fun hashCode() = value.hashCode()
-}
-
-//@Serializer(forClass = BigInteger::class)
-//object BigIntegerSerializer : KSerializer<BigInteger>
 
 class KotlinxSerializationTest : StringSpec() {
     init {
-        "Serialize and deserialize a simple object correctly" {
-            val originalObject = SimpleDataClass("some value")
-            val jsonRepresentation = JSON.stringify(originalObject)
-            val parsedObject = JSON.parse<SimpleDataClass>(jsonRepresentation)
-
-            println(jsonRepresentation)
-            originalObject shouldEqual parsedObject
-        }
-
-        "Serialize a basic class from src/main" {
-            val original = TestEntity(listOf("please work now"))
-            val json = JSON.stringify(original)
-            val parsed = JSON.parse<TestEntity>(json)
-
-            println(json)
-            original shouldEqual parsed
-        }
-                                  
-        "Serialize another snowflake-like class" {
-            val original = SnowflakeCopy("1234567890")
-            val json = JSON.stringify(original)
-            val parsed = JSON.parse<SnowflakeCopy>(json)
-
-            println(json)
-            original shouldEqual parsed
-        }
-
-        "Serialize a snowflake correctly" {
-            val original = Snowflake("1234567890")
-            val json = JSON.stringify(original)
-            val parsed = JSON.parse<Snowflake>(json)
-
-            println(json)
-            original shouldEqual parsed
-        }
-
         "Serialize a payload correctly" {
             val original = Payload(
                 opcode = Opcode.HEARTBEAT
-                //data = 3.toString()
             )
-            val json = JSON.stringify(original)
-            val parsed = JSON.parse<Payload>(json)
+            val klaxon = Klaxon().withDefaultConverters()
+            val json = klaxon.toJsonString(original)
+            val parsed = klaxon.parse<Payload>(json)
 
             println(json)
             original shouldEqual parsed
@@ -154,8 +62,9 @@ class KotlinxSerializationTest : StringSpec() {
                 true,
                 "awesome@google.notascam.com"
             )
-            val json = JSON.stringify(original)
-            val parsed = JSON.parse<User>(json)
+            val klaxon = Klaxon().withDefaultConverters()
+            val json = klaxon.toJsonString(original)
+            val parsed = klaxon.parse<User>(json)
 
             println(json)
             original shouldEqual parsed

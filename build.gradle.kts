@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+@file:Suppress("PropertyName")
+
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.internal.HasConvention
 import org.gradle.internal.impldep.com.amazonaws.services.s3.model.SSEAlgorithm
@@ -35,28 +37,39 @@ import java.util.Properties
 import java.util.Date
 import java.text.SimpleDateFormat
 
+
+val kotlin_version: String by extra
+val kotlinx_coroutines_version: String by extra
+val dokka_version: String by extra
+val klaxon_version: String by extra
+val tyrus_version: String by extra
+val fuel_version: String by extra
+val slf4j_version: String by extra
+val kotlin_logging_version: String by extra
+
+val kotlin_test_version: String by extra
+val log4j_version: String by extra
+
 buildscript {
-    extra["kotlinVersion"] = "1.2.31"
-    extra["kotlinxCoroutinesVersion"] = "0.21.1"
-    extra["kotlinSerializationVersion"] = "0.4.2"
-    extra["dokkaVersion"] = "0.9.16"
+    val kotlin_version by extra { "1.2.31" }
+    val kotlinx_coroutines_version by extra { "0.21.1" }
+    val dokka_version by extra { "0.9.16" }
+    val klaxon_version by extra { "2.1.14" }
+    val tyrus_version by extra { "1.13.1" }
+    val fuel_version by extra { "1.12.0" }
+    val slf4j_version by extra { "1.7.5" }
+    val kotlin_logging_version by extra { "1.4.9" }
 
-    extra["tyrusVersion"] = "1.13.1"
-    extra["fuelVersion"] = "1.12.0"
-    extra["slf4jVersion"] = "1.7.5"
-    extra["kotlinLoggingVersion"] = "1.4.9"
-
-    extra["kotlinTestVersion"] = "2.0.0"
-    extra["log4jVersion"] = "2.7"
+    val kotlin_test_version by extra { "2.0.0" }
+    val log4j_version by extra { "2.7" }
 
     repositories {
         jcenter()
         maven("https://kotlin.bintray.com/kotlinx")
     }
     dependencies {
-        classpath(kotlin("gradle-plugin", extra["kotlinVersion"].toString()))
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:${extra["dokkaVersion"]}")
-        classpath("org.jetbrains.kotlinx:kotlinx-gradle-serialization-plugin:${extra["kotlinSerializationVersion"]}")
+        classpath(kotlin("gradle-plugin", kotlin_version))
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version")
     }
 }
 
@@ -75,7 +88,6 @@ plugins {
 apply {
     plugin("kotlin")
     plugin("org.jetbrains.dokka")
-    plugin("kotlinx-serialization")
 }
 
 kotlin {
@@ -88,21 +100,20 @@ repositories {
 }
 
 dependencies {
-    compile(kotlin("stdlib-jdk8", extra["kotlinVersion"].toString()))
-    compile(kotlin("reflect", extra["kotlinVersion"].toString()))
-    compile(kotlinx("coroutines-core", extra["kotlinxCoroutinesVersion"].toString()))
-    compile(kotlinx("serialization-runtime", extra["kotlinSerializationVersion"].toString()))
-    compile("com.beust:klaxon:2.1.14")
-    compile("org.glassfish.tyrus.bundles:tyrus-standalone-client-jdk:${extra["tyrusVersion"]}")
-    compile("com.github.kittinunf.fuel:fuel:${extra["fuelVersion"]}")
-    compile("org.slf4j:slf4j-api:${extra["slf4jVersion"]}")
-    compile("io.github.microutils:kotlin-logging:${extra["kotlinLoggingVersion"]}")
+    compile(kotlin("stdlib-jdk8", kotlin_version))
+    compile(kotlin("reflect", kotlin_version))
+    compile(kotlinx("coroutines-core", kotlinx_coroutines_version))
+    compile("com.beust:klaxon:$klaxon_version")
+    compile("org.glassfish.tyrus.bundles:tyrus-standalone-client-jdk:$tyrus_version")
+    compile("com.github.kittinunf.fuel:fuel:$fuel_version")
+    compile("org.slf4j:slf4j-api:$slf4j_version")
+    compile("io.github.microutils:kotlin-logging:$kotlin_logging_version")
 
 
-    testCompile("io.kotlintest:kotlintest:${extra["kotlinTestVersion"]}")
-    testCompile("org.apache.logging.log4j:log4j-api:${extra["log4jVersion"]}")
-    testCompile("org.apache.logging.log4j:log4j-core:${extra["log4jVersion"]}")
-    testCompile("org.apache.logging.log4j:log4j-slf4j-impl:${extra["log4jVersion"]}")
+    testCompile("io.kotlintest:kotlintest:$kotlin_test_version")
+    testCompile("org.apache.logging.log4j:log4j-api:$log4j_version")
+    testCompile("org.apache.logging.log4j:log4j-core:$log4j_version")
+    testCompile("org.apache.logging.log4j:log4j-slf4j-impl:$log4j_version")
 }
 
 val processResources by tasks

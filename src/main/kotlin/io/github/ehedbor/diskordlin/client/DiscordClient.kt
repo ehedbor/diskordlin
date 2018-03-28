@@ -24,19 +24,22 @@
 
 package io.github.ehedbor.diskordlin.client
 
+import com.beust.klaxon.Klaxon
 import io.github.ehedbor.diskordlin.entities.channel.Channel
+import io.github.ehedbor.diskordlin.entities.channel.Message
 import io.github.ehedbor.diskordlin.entities.gateway.*
+import io.github.ehedbor.diskordlin.entities.gateway.event.ReadyEvent
 import io.github.ehedbor.diskordlin.entities.guild.UnavailableGuild
 import io.github.ehedbor.diskordlin.entities.user.Activity
 import io.github.ehedbor.diskordlin.entities.user.ActivityType
 import io.github.ehedbor.diskordlin.entities.user.User
 import io.github.ehedbor.diskordlin.util.Logger
 import io.github.ehedbor.diskordlin.util.decompressZLib
+import io.github.ehedbor.diskordlin.util.withDefaultConverters
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.newSingleThreadContext
-import kotlinx.serialization.json.JSON
 import java.net.URI
 import java.util.concurrent.TimeUnit
 import javax.websocket.*
@@ -86,7 +89,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      */
     @OnMessage
     fun onMessageReceived(message: String) {
-        val payload = JSON.parse<Payload>(message)
+        val payload = Klaxon().withDefaultConverters().parse<Payload>(message)!!
 
         if (payload.opcode == Opcode.DISPATCH)
             info("Received event (${payload.eventName}).")
@@ -96,10 +99,9 @@ internal class DiscordClient(val token: String, endpointUri: String) {
         when (payload.opcode) {
             Opcode.DISPATCH -> handleDispatch(payload)
             Opcode.HELLO -> {
-                // TODO fix this code
-                //val data = payload.getDataAs<HelloPayload>()!!
-                //val interval = data.heartbeatInterval
-                //this.startHeartbeat(interval)
+                val data = payload.getDataAs<HelloPayload>()!!
+                val interval = data.heartbeatInterval
+                this.startHeartbeat(interval)
             }
             Opcode.HEARTBEAT_ACK -> {
                 if (!hasIdentified) {
@@ -126,7 +128,7 @@ internal class DiscordClient(val token: String, endpointUri: String) {
 
     fun sendMessage(message: String) = session.basicRemote.sendText(message)
 
-    fun sendMessage(payload: Payload) =  sendMessage(JSON.stringify(payload))
+    fun sendMessage(payload: Payload) =  sendMessage(Klaxon().withDefaultConverters().toJsonString(payload))
 
     fun sendMessageAsync(message: String)= async { sendMessage(message) }
 
@@ -138,18 +140,17 @@ internal class DiscordClient(val token: String, endpointUri: String) {
     private fun handleDispatch(payload: Payload) {
         when (payload.eventName) {
             "READY" -> {
-                // TODO fix this too
-//                val data = payload.getDataAs<ReadyEvent>()!!
-//                this.userInfo = data.user
-//                this.dmChannels = data.privateChannels
-//                this.joinedGuilds = data.guilds
-//                this.sessionId = data.sessionId
+                val data = payload.getDataAs<ReadyEvent>()!!
+                this.userInfo = data.user
+                this.dmChannels = data.privateChannels
+                this.joinedGuilds = data.guilds
+                this.sessionId = data.sessionId
                 //TODO uncomment this
                 //Events.ready(data)
             }
             "MESSAGE_CREATE" -> {
                 // TODO uncomment thos
-                //val msg = payload.getDataAs<Message>()!!
+                val msg = payload.getDataAs<Message>()!!
                 //Events.messageCreate(msg)
             }
             else -> {
@@ -187,9 +188,9 @@ internal class DiscordClient(val token: String, endpointUri: String) {
                 afk = false
             )
         )
-        // TODO repair this
-       // val payload = Payload(Opcode.IDENTIFY, identifyPayload)
-        //this.sendMessageAsync(JSON.stringify(payload))
+
+        val payload = Payload(Opcode.IDENTIFY, identifyPayload)
+        this.sendMessageAsync(Klaxon().withDefaultConverters().toJsonString(payload))
     }
 
     /**
@@ -213,6 +214,6 @@ internal class DiscordClient(val token: String, endpointUri: String) {
         info("Sending heartbeat!")
 
         val msg = Payload(Opcode.HEARTBEAT)
-        this.sendMessage(JSON.stringify(msg))
+        this.sendMessage(Klaxon().withDefaultConverters().toJsonString(msg))
     }
 }

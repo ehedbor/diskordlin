@@ -24,23 +24,17 @@
 
 package io.github.ehedbor.diskordlin.entities.user
 
+import com.beust.klaxon.Json
 import io.github.ehedbor.diskordlin.entities.Snowflake
-import kotlinx.serialization.Optional
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerialName as Name
 
 @Suppress("MemberVisibilityCanBePrivate")
-@Serializable
 data class User(
-    var id: Snowflake,
-    var username: String,
-    var discriminator: String,
-    @Optional var avatar: String? = null,
-    @Optional @Name("bot") var isBot: Boolean = false,
-    @Optional @Name("mfa_enabled") var twoFactorAuthEnabled: Boolean = false,
-    @Optional var verified: Boolean = false,
-    @Optional var email: String? = null
-) {
-
-    override fun toString() = username
-}
+    val id: Snowflake,
+    val username: String,
+    val discriminator: String,
+    val avatar: String? = null,
+    @Json("bot") val isBot: Boolean = false,
+    @Json("mfa_enabled") val twoFactorAuthEnabled: Boolean = false,
+    val verified: Boolean = false,
+    val email: String? = null
+)

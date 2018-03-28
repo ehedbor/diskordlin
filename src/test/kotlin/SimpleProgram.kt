@@ -70,14 +70,11 @@
  * SOFTWARE.
  */
 
-import io.github.ehedbor.diskordlin.BuildInfo
 import io.github.ehedbor.diskordlin.Diskordlin
 import io.github.ehedbor.diskordlin.client.ClientType
 import io.github.ehedbor.diskordlin.entities.channel.Message
-import io.github.ehedbor.diskordlin.entities.gateway.GatewayBotResponse
 import io.github.ehedbor.diskordlin.util.Logger
 import kotlinx.coroutines.experimental.runBlocking
-import kotlinx.serialization.json.JSON
 
 object SimpleProgram : Logger {
 
@@ -85,10 +82,6 @@ object SimpleProgram : Logger {
 
     @JvmStatic
     fun main(args: Array<String>): Unit = runBlocking {
-        val response = GatewayBotResponse("hi", 3)
-        val json = JSON.stringify(response)
-        val serial = JSON.parse<GatewayBotResponse>(json)
-
         token = args[0]
         Diskordlin(token, ClientType.BOT).apply {
 //            Events.messageCreate += SimpleProgram::onMessageCreated
@@ -102,14 +95,12 @@ object SimpleProgram : Logger {
         |diskordlin {
         |    token = TOKEN
         |    type = ClientType.BOT
-        |    messageCreate += ::onMessageCreated
-        |    typingStart += { event ->
+        |    event{"MESSAGE_CREATE"] += ::onMessageCreated
+        |    event["TYPING_START"] += { event ->
         |        event.reply("No typing allowed")
         |    }
         |}
         """.trimMargin()
-
-        info(BuildInfo.version)
 
         //Delay forever
         while (true) {
@@ -118,6 +109,7 @@ object SimpleProgram : Logger {
 
     @Suppress("UNUSED_PARAMETER")
     private fun onMessageCreated(message: Message) {
+        // TODO make api to do this basically
 //        if (message.content.startsWith("$")) {
 //            info("Received command \"${message.content}\" from ${message.author}")
 //
