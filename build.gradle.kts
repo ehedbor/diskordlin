@@ -81,8 +81,6 @@ allprojects {
 plugins {
     base
     kotlin("jvm") version "1.2.31"
-    `maven-publish`
-    id("com.jfrog.bintray") version "1.7.3"
 }
 
 apply {
@@ -108,7 +106,6 @@ dependencies {
     compile("com.github.kittinunf.fuel:fuel:$fuel_version")
     compile("org.slf4j:slf4j-api:$slf4j_version")
     compile("io.github.microutils:kotlin-logging:$kotlin_logging_version")
-
 
     testCompile("io.kotlintest:kotlintest:$kotlin_test_version")
     testCompile("org.apache.logging.log4j:log4j-api:$log4j_version")
@@ -156,39 +153,10 @@ val dokkaJar by tasks.creating(Jar::class) {
     classifier = "invalid"
 }
 
-publishing {
-    (publications) {
-        "BintrayRelease"(MavenPublication::class) {
-            from(components["java"])
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
-            artifact(sourcesJar)
-            artifact(dokkaJar)
-        }
-    }
+fun DependencyHandler.kotlinx(module: String, version: String? = null) : String {
+    val verStr = if (version != null) ":$version" else ""
+    return "org.jetbrains.kotlinx:kotlinx-$module$verStr"
 }
-
-bintray {
-    user = getProjectProperty("bintray.user")
-    key = getProjectProperty("bintray.key")
-    setPublications("BintrayRelease")
-    pkg.apply {
-        repo = "maven"
-        name = "diskordlin"
-        setLicenses("MIT")
-        vcsUrl = "https://github.com/ehedbor/diskordlin.git"
-        publish = true
-        version.apply {
-            name = "${project.version}"
-            val dtf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
-            released = dtf.format(Date())
-        }
-    }
-}
-
-fun DependencyHandler.kotlinx(module: String, version: String? = null) = "org.jetbrains.kotlinx:kotlinx-$module${version?.let { ":$version" }
-    ?: ""}"
 
 fun getProjectProperty(name: String): String = if (hasProperty(name)) properties[name] as String else ""
 val compileKotlin: KotlinCompile by tasks

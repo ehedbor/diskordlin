@@ -69,7 +69,16 @@ data class Payload(
         }
 
         override fun toJson(value: Payload): String? {
-            TODO("Not implemented")
+            // capture a copy of parsedData so that it can be smart cast to Any
+            val tempParsedData = value.parsedData
+
+            val dataJson = when {
+                value.data != null -> value.data.toJsonString()
+                tempParsedData != null -> Klaxon().toJsonString(tempParsedData)
+                else -> throw IllegalStateException("Either data or parsedData must be present!")
+            }
+
+            return """{"op":${value.opcode},"d":$dataJson,"s":${value.sequenceNumber},"eventName":"${value.eventName}"}"""
         }
     }
 
@@ -83,13 +92,11 @@ data class Payload(
      */
     fun <T : Any> getDataAs(type: KClass<T>): T? {
         return if (parsedData == null) {
-            if (data == null) {
-                null
-            } else {
+            data?.let {
                 // Cache the parsed value once it is created
-                val obj = type.safeCast(Klaxon().fromJsonObject(data, type.java, type))
-                parsedData = obj
-                obj
+                val parsed = type.safeCast(Klaxon().fromJsonObject(data, type.java, type))
+                parsedData = parsed
+                parsed
             }
         } else {
             type.safeCast(parsedData)
