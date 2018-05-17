@@ -50,8 +50,9 @@ val kotlin_logging_version: String by extra
 val kotlin_test_version: String by extra
 val log4j_version: String by extra
 
+@Suppress("UNUSED_VARIABLE", "LocalVariableName")
 buildscript {
-    val kotlin_version by extra { "1.2.31" }
+    val kotlin_version by extra { "1.2.41" }
     val kotlinx_coroutines_version by extra { "0.21.1" }
     val dokka_version by extra { "0.9.16" }
     val klaxon_version by extra { "2.1.14" }

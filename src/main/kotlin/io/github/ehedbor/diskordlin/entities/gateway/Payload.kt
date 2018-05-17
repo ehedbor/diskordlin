@@ -25,6 +25,7 @@
 package io.github.ehedbor.diskordlin.entities.gateway
 
 import com.beust.klaxon.*
+import io.github.ehedbor.diskordlin.util.withDefaultConverters
 import kotlin.reflect.KClass
 import kotlin.reflect.full.safeCast
 
@@ -45,15 +46,27 @@ data class Payload(
     @Json("t") val eventName: String? = null
 ) {
 
-    var parsedData: Any? = null
-        private set
+    // stores the internal representation of the data
+    private var parsedData: Any? = null
 
-    constructor(opcode: Int, innerPayload: Any?, sequenceNumber: Int? = null, eventName: String? = null)
-        : this(
-        opcode = opcode,
-        data = null,
-        sequenceNumber = sequenceNumber,
-        eventName = eventName) {
+    init {
+        // some state checking
+        if (opcode != Opcode.DISPATCH) {
+            check(sequenceNumber == null) { "Sequence numbers are only for Opcode.DISPATCH" }
+            check(eventName == null) { "Event names are only for Opcode.DISPATCH" }
+        }
+    }
+
+    /**
+     * Constructs a [Payload] object with an [innerPayload].
+     */
+    constructor(opcode: Int, innerPayload: Any?, sequenceNumber: Int? = null, eventName: String? = null) :
+        this(
+            opcode = opcode,
+            data = null,
+            sequenceNumber = sequenceNumber,
+            eventName = eventName
+        ) {
         parsedData = innerPayload
     }
 
@@ -62,7 +75,7 @@ data class Payload(
             val opcode = jv.obj?.int("op")
             val data = jv.obj?.obj("d")
             val sequenceNumber = jv.obj?.int("s")
-            val eventName = jv.obj?.string("eventName")
+            val eventName = jv.obj?.string("t")
 
             requireNotNull(opcode) { "Opcode must be present!" }
             return Payload(opcode!!, data, sequenceNumber, eventName)
@@ -74,27 +87,27 @@ data class Payload(
 
             val dataJson = when {
                 value.data != null -> value.data.toJsonString()
-                tempParsedData != null -> Klaxon().toJsonString(tempParsedData)
-                else -> throw IllegalStateException("Either data or parsedData must be present!")
+                tempParsedData != null -> Klaxon().withDefaultConverters().toJsonString(tempParsedData)
+                else -> null
             }
 
-            return """{"op":${value.opcode},"d":$dataJson,"s":${value.sequenceNumber},"eventName":"${value.eventName}"}"""
+            return """{"op":${value.opcode},"d":$dataJson,"s":${value.sequenceNumber},"t":"${value.eventName}"}"""
         }
     }
 
     /**
      * Parses the [data] as the given type [T].
      */
-    inline fun <reified T : Any> getDataAs() = getDataAs(T::class)
+    inline fun <reified T : Any> getParsedDataAs() = getParsedDataAs(T::class)
 
     /**
      * Parses the [data] as the given [type].
      */
-    fun <T : Any> getDataAs(type: KClass<T>): T? {
+    fun <T : Any> getParsedDataAs(type: KClass<T>): T? {
         return if (parsedData == null) {
             data?.let {
                 // Cache the parsed value once it is created
-                val parsed = type.safeCast(Klaxon().fromJsonObject(data, type.java, type))
+                val parsed = type.safeCast(Klaxon().withDefaultConverters().fromJsonObject(data, type.java, type))
                 parsedData = parsed
                 parsed
             }

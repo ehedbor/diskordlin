@@ -25,42 +25,30 @@
 package io.github.ehedbor.diskordlin.event
 
 /**
- * Represents an event that can be subscribed to and invoked.
- *
- * @param T The parameter that this event takes.
+ * Represents an event that can be listened to and invoked.
  */
-class Event<T> {
+class Event {
 
-    private val listeners: MutableMap<String?, MutableList<EventListener<T>>> = mutableMapOf()
+    private val listeners: MutableList<EventListener> = mutableListOf()
 
-    @JvmName("put")
-    operator fun plusAssign(handler: EventListener<T>) = set(null, handler)
-
-    @JvmName("put")
-    operator fun plusAssign(namedHandler: Pair<String?, EventListener<T>>) = set(namedHandler.first, namedHandler.second)
-
-    @JvmName("put")
-    operator fun set(eventName: String?, eventHandler: EventListener<T>) {
-        if (listeners[eventName] == null) {
-            listeners[eventName] = mutableListOf()
-        }
-        listeners[eventName]!! += eventHandler
+    @JvmName("add")
+    operator fun plusAssign(eventHandler: EventListener) {
+        listeners += eventHandler
     }
 
     /**
-     * Removes all events associated with this identifier.
+     * Removes all listeners associated with this event.
      */
-    @JvmName("remove")
-    operator fun minusAssign(eventName: String?) {
-        listeners.remove(eventName)
+    fun removeAll(eventName: String?) {
+        listeners.removeAll { true }
     }
 
     /**
      * Executes every listener to this event.
      */
-    operator fun invoke(parameter: T) {
-        for ((_, listenerList) in listeners) {
-            listenerList.forEach { it(parameter) }
+    operator fun invoke(args: EventArgs) {
+        for (listener in listeners) {
+            listener(args)
         }
     }
 }

@@ -102,7 +102,7 @@ class KotlinxSerializationTest : StringSpec() {
             val payload = Klaxon().converter(Payload).parse<Payload>(json)
             when (payload?.opcode) {
                 Opcode.IDENTIFY -> {
-                    payload.getDataAs<IdentifyPayload>()!!
+                    payload.getParsedDataAs<IdentifyPayload>()!!
                 }
             }
         }

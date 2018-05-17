@@ -25,6 +25,7 @@
 package io.github.ehedbor.diskordlin.client
 
 import com.beust.klaxon.Klaxon
+import io.github.ehedbor.diskordlin.Diskordlin
 import io.github.ehedbor.diskordlin.entities.channel.Channel
 import io.github.ehedbor.diskordlin.entities.channel.Message
 import io.github.ehedbor.diskordlin.entities.gateway.*
@@ -33,6 +34,7 @@ import io.github.ehedbor.diskordlin.entities.guild.UnavailableGuild
 import io.github.ehedbor.diskordlin.entities.user.Activity
 import io.github.ehedbor.diskordlin.entities.user.ActivityType
 import io.github.ehedbor.diskordlin.entities.user.User
+import io.github.ehedbor.diskordlin.event.EventArgs
 import io.github.ehedbor.diskordlin.util.Logger
 import io.github.ehedbor.diskordlin.util.decompressZLib
 import io.github.ehedbor.diskordlin.util.withDefaultConverters
@@ -49,7 +51,7 @@ import javax.websocket.*
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 @ClientEndpoint
-internal class DiscordClient(val token: String, endpointUri: String) {
+internal class DiscordClient(val api: Diskordlin, val token: String, endpointUri: String) : Logger {
 
     private lateinit var session: Session
     private var hasIdentified: Boolean = false
@@ -58,8 +60,6 @@ internal class DiscordClient(val token: String, endpointUri: String) {
     private var dmChannels: List<Channel>? = null
     private var joinedGuilds: List<UnavailableGuild>? = null
     private var sessionId: String? = null
-
-    companion object : Logger
 
     init {
         val container = ContainerProvider.getWebSocketContainer()
@@ -91,15 +91,16 @@ internal class DiscordClient(val token: String, endpointUri: String) {
     fun onMessageReceived(message: String) {
         val payload = Klaxon().withDefaultConverters().parse<Payload>(message)!!
 
-        if (payload.opcode == Opcode.DISPATCH)
+        if (payload.opcode == Opcode.DISPATCH) {
             info("Received event (${payload.eventName}).")
-        else
+        } else {
             info("Received message (${Opcode.nameOf(payload.opcode)}).")
+        }
 
         when (payload.opcode) {
             Opcode.DISPATCH -> handleDispatch(payload)
             Opcode.HELLO -> {
-                val data = payload.getDataAs<HelloPayload>()!!
+                val data = payload.getParsedDataAs<HelloPayload>()!!
                 val interval = data.heartbeatInterval
                 this.startHeartbeat(interval)
             }
@@ -138,23 +139,31 @@ internal class DiscordClient(val token: String, endpointUri: String) {
      * Handles [Opcode.DISPATCH].
      */
     private fun handleDispatch(payload: Payload) {
-        when (payload.eventName) {
+        when (payload.eventName!!) {
             "READY" -> {
-                val data = payload.getDataAs<ReadyEvent>()!!
+                val data = payload.getParsedDataAs<ReadyEvent>()!!
+
                 this.userInfo = data.user
                 this.dmChannels = data.privateChannels
                 this.joinedGuilds = data.guilds
                 this.sessionId = data.sessionId
-                //TODO uncomment this
-                //Events.ready(data)
+
+                api.eventManager.invokeEvent("READY", EventArgs(
+                    "api" to api,
+                    "event" to data
+                ))
             }
             "MESSAGE_CREATE" -> {
-                // TODO uncomment thos
-                val msg = payload.getDataAs<Message>()!!
-                //Events.messageCreate(msg)
+                val msg = payload.getParsedDataAs<Message>()!!
+
+                api.eventManager.invokeEvent("MESSAGE_CREATE", EventArgs(
+                    "api" to api,
+                    "message" to msg
+                ))
             }
             else -> {
-                trace("Unhandled event type \"${payload.eventName}\"")
+                api.eventManager.invokeEvent(payload.eventName, EventArgs("api" to api))
+                warn("Unhandled event type \"${payload.eventName}\"")
             }
         }
     }

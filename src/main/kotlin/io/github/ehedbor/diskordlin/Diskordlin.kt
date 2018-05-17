@@ -28,6 +28,8 @@ import com.github.kittinunf.fuel.httpGet
 import io.github.ehedbor.diskordlin.client.ClientType
 import io.github.ehedbor.diskordlin.client.DiscordClient
 import io.github.ehedbor.diskordlin.entities.gateway.GatewayBotResponse
+import io.github.ehedbor.diskordlin.event.EventListener
+import io.github.ehedbor.diskordlin.event.EventManager
 import io.github.ehedbor.diskordlin.util.Logger
 import io.github.ehedbor.diskordlin.util.responseObject
 import kotlinx.coroutines.experimental.async
@@ -40,9 +42,17 @@ import kotlinx.coroutines.experimental.async
  * @param clientType The type of client connecting.
  */
 @Suppress("MemberVisibilityCanBePrivate")
-class Diskordlin constructor(val token: String, val clientType: ClientType) {
+class Diskordlin constructor(val token: String, val clientType: ClientType) : Logger {
 
     internal lateinit var client: DiscordClient
+    internal val eventManager = EventManager()
+
+    /**
+     * Adds an event to the [eventManager].
+     */
+    fun register(eventName: String, listener: EventListener) {
+        eventManager.register(eventName, listener)
+    }
 
     /**
      * Starts to log a [DiscordClient] into the Discord gateway API.
@@ -65,7 +75,7 @@ class Diskordlin constructor(val token: String, val clientType: ClientType) {
         // add encoding and version info
         val url = "${response.url}/?encoding=json&v=$WEBSOCKET_API_VERSION"
         // create the client endpoint
-        client = DiscordClient(token, url)
+        client = DiscordClient(this, token, url)
 
         info("Successfully logged in!")
     }
@@ -88,7 +98,7 @@ class Diskordlin constructor(val token: String, val clientType: ClientType) {
         )
     }
 
-    companion object : Logger {
+    companion object {
         /** The Discord API version. */
         const val API_VERSION = "6"
 
