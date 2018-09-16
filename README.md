@@ -1,4 +1,4 @@
 # diskordlin
 A Discord api written in Kotlin.
 
-Currently does nothing but will eventually work!
+Currently does nothing but might eventually work!
