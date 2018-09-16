@@ -28,6 +28,29 @@ import com.beust.klaxon.Json
 import io.github.ehedbor.diskordlin.entities.Snowflake
 import io.github.ehedbor.diskordlin.entities.user.User
 
+/**
+ * Represents a guild or DM channel within Discord.
+ *
+ * Documentation copied from [here](https://discordapp.com/developers/docs/resources/channel#channel-object).
+ *
+ * @property id the id of this channel
+ * @property type the type of channel (see [ChannelType])
+ * @property guildId the id of the guild
+ * @property position sorting position of the channel
+ * @property permissionOverwrites expicit permission overwrites for members and roles
+ * @property name the name of the channel (2-100 characters)
+ * @property topic the channel topic (0-1024 characters)
+ * @property nsfw if the channel is nsfw
+ * @property lastMessageId the id of the last message sent in this channel (may not point to an existing or valid message)
+ * @property bitrate the bitrate (in bits) of the voice channel
+ * @property userLimit the user limit of the voice channel
+ * @property recipients the recipients of the DM
+ * @property icon icon hash
+ * @property ownerId id of the DM creator
+ * @property applicationId application id of the group DM creator if it is bot-created
+ * @property parentId id of the parent category for a channel
+ * @property lastPinTimestamp when the last pinned message was pinned (ISO8601 timestamp)
+ */
 data class Channel(
     val id: Snowflake,
     val type: Int,

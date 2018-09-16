@@ -25,6 +25,11 @@
 package io.github.ehedbor.diskordlin.event
 
 /**
+ * Represents a method that is called by [Event]s.
+ */
+typealias EventListener = (EventArgs) -> Unit
+
+/**
  * Represents an event that can be listened to and invoked.
  */
 class Event {

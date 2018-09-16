@@ -24,6 +24,13 @@
 
 package io.github.ehedbor.diskordlin.entities.channel
 
+/**
+ * Documentation copied from [here](https://discordapp.com/developers/docs/resources/channel).
+ *
+ * @property count times this emoji has been used to react
+ * @property me whether the current user reacted using this emoji
+ * @property emoji emoji information
+ */
 data class Reaction(
     val count: Int,
     val me: Boolean,

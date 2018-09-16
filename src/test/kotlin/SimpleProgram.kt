@@ -22,10 +22,14 @@
  * SOFTWARE.
  */
 
+import com.github.kittinunf.fuel.httpPost
 import io.github.ehedbor.diskordlin.Diskordlin
+import io.github.ehedbor.diskordlin.apiPath
 import io.github.ehedbor.diskordlin.client.ClientType
 import io.github.ehedbor.diskordlin.entities.channel.Message
+import io.github.ehedbor.diskordlin.event.EventArgs
 import io.github.ehedbor.diskordlin.util.Logger
+import io.github.ehedbor.diskordlin.util.responseObject
 import kotlinx.coroutines.experimental.runBlocking
 
 object SimpleProgram : Logger {
@@ -39,55 +43,31 @@ object SimpleProgram : Logger {
             register("READY") {
                 info("Hello, events!")
             }
+            register("MESSAGE_CREATE", ::onMessageCreated)
             login()
         }
-        // What I'd like the api to look like in the future
-        """
-        |diskordlin {
-        |    token = TOKEN
-        |    type = ClientType.BOT
-        |    event{"MESSAGE_CREATE"] += ::onMessageCreated
-        |    event["TYPING_START"] += { event ->
-        |        event.reply("No typing allowed")
-        |    }
-        |}
-        """.trimMargin()
 
         //Delay forever
-        while (true) {
-        }
+        while (true) {}
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    private fun onMessageCreated(message: Message) {
-        // TODO make api to do this basically
-//        if (message.content.startsWith("$")) {
-//            info("Received command \"${message.content}\" from ${message.author}")
-//
-//            val parameters = message.content
-//                .substring(1)
-//                .split(Pattern.compile("\\n"))
-//            val cmd = parameters[0].toLowerCase()
-//            if (cmd == "greeting") {
-//                //message.reply("Pong!")
-//                "${Diskordlin.API}/channels/${message.channelId}/messages".httpPost()
-//                    .header(Diskordlin.HTTP_USER_AGENT)
-//                    .header("Authorization" to "Bot $token")
-//                    .body(jsonObject(
-//                        "content" to "Hello, ${message.author}!"
-//                    ))
-//                    .responseObject<Message> { _, _, result ->
-//                        when (result) {
-//                            is Result.Failure -> {
-//                                error("Error while sending message.", result.getException())
-//                            }
-//                        }
-//                    }
-//
-//            } else {
-//                //message.reply("Unknown command \"$cmd\")
-//            }
-//        }
-    }
+    private fun onMessageCreated(args: EventArgs) {
+        info("Now handling MESSAGE_CREATE")
+        val msg = args["message"] as Message
+        val reply = """{"content"="Hello, ${msg.author}!"}"""
 
+        if (!msg.content.startsWith("\$hi")) return
+
+        apiPath("channels", msg.channelId, "messages")
+            .httpPost(listOf("content" to "Hello, ${msg.author}"))
+            .header(Diskordlin.HTTP_USER_AGENT)
+            .header("Authorization" to "Bot $token")
+            .responseObject<Message> { request, response, result ->
+                result.fold(success = {
+                    info("I sent a message!")
+                }, failure = {
+                    error("I did not send a message!", it)
+                })
+            }
+    }
 }

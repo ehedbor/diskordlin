@@ -150,13 +150,23 @@ internal class DiscordClient(val api: Diskordlin, val token: String, endpointUri
 
                 api.eventManager.invokeEvent("READY", EventArgs(
                     "api" to api,
-                    "event" to data
+                    "user" to userInfo,
+                    "private_channels" to dmChannels,
+                    "guilds" to joinedGuilds,
+                    "session_id" to sessionId
                 ))
             }
             "MESSAGE_CREATE" -> {
                 val msg = payload.getParsedDataAs<Message>()!!
 
                 api.eventManager.invokeEvent("MESSAGE_CREATE", EventArgs(
+                    "api" to api,
+                    "message" to msg
+                ))
+            }
+            "MESSAGE_UPDATE" -> {
+                val msg = payload.getParsedDataAs<Message>()!!
+                api.eventManager.invokeEvent("MESSAGE_UPDATE", EventArgs(
                     "api" to api,
                     "message" to msg
                 ))

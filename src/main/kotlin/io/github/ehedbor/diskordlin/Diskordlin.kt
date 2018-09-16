@@ -32,7 +32,6 @@ import io.github.ehedbor.diskordlin.event.EventListener
 import io.github.ehedbor.diskordlin.event.EventManager
 import io.github.ehedbor.diskordlin.util.Logger
 import io.github.ehedbor.diskordlin.util.responseObject
-import kotlinx.coroutines.experimental.async
 
 /**
  * The main Diskordlin API.
@@ -52,17 +51,6 @@ class Diskordlin constructor(val token: String, val clientType: ClientType) : Lo
      */
     fun register(eventName: String, listener: EventListener) {
         eventManager.register(eventName, listener)
-    }
-
-    /**
-     * Starts to log a [DiscordClient] into the Discord gateway API.
-     *
-     * @param token The authentication token.
-     * @param clientType The type of client logging in.
-     */
-    @Suppress("RemoveExplicitTypeArguments")
-    fun loginAsync() = async {
-        login()
     }
 
     /**
@@ -119,4 +107,11 @@ class Diskordlin constructor(val token: String, val clientType: ClientType) : Lo
         }
     }
 }
+
+/**
+ * Builds a Discord API path.
+ *
+ * @see Diskordlin.API
+ */
+fun apiPath(vararg path: Any) =Diskordlin.API + path.joinToString("/")
 

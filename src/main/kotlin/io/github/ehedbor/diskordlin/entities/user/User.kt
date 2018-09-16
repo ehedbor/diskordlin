@@ -27,6 +27,27 @@ package io.github.ehedbor.diskordlin.entities.user
 import com.beust.klaxon.Json
 import io.github.ehedbor.diskordlin.entities.Snowflake
 
+/**
+ * Represents a Discord user.
+ *
+ * Users in Discord are generally considered the base entity. Users can spawn across the entire
+ * platform, be members of guilds, participate in text and voice chat, and much more. Users are
+ * separated by a distinction of "bot" vs "normal." Although they are similar, bot users are
+ * automated users that are "owned" by another user. Unlike normal users, bot users do not have a
+ * limitation on the number of Guilds they can be a part of.
+ *
+ * Documentation copied from [here](https://discordapp.com/developers/docs/resources/user).
+ *
+ * @property id the user's id
+ * @property username the user's username, not unique across the platform
+ * @property discriminator the user's 4-digit discord-tag
+ * @property avatar the user's avatar hash
+ * @property isBot whether the user belongs to an OAuth2 application
+ * @property mfaEnabled whether the user has two factor enabled on their account
+ * @property locale the user's chosen language option
+ * @property verified whether the email on this account has been verified
+ * @property email the user's email
+ */
 @Suppress("MemberVisibilityCanBePrivate")
 data class User(
     val id: Snowflake,
@@ -34,7 +55,11 @@ data class User(
     val discriminator: String,
     val avatar: String? = null,
     @Json("bot") val isBot: Boolean = false,
-    @Json("mfa_enabled") val twoFactorAuthEnabled: Boolean = false,
+    @Json("mfa_enabled") val mfaEnabled: Boolean = false,
+    val locale: String? = null,
     val verified: Boolean = false,
     val email: String? = null
-)
+) {
+
+    override fun toString() = username
+}

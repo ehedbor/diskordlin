@@ -46,8 +46,8 @@ inline fun <reified T : Any> Request.responseObject(): Triple<Request, Response,
 }
 
 
-inline fun <reified T : Any> jsonDeserializerOf() = object : ResponseDeserializable<T> {
+inline fun <reified T : Any> jsonDeserializerOf()= object : ResponseDeserializable<T> {
     override fun deserialize(content: String): T? {
-        return Klaxon().parse<T>(content)
+        return Klaxon().withDefaultConverters().parse<T>(content)
     }
 }

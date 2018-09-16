@@ -26,5 +26,10 @@ package io.github.ehedbor.diskordlin.entities.guild
 
 import io.github.ehedbor.diskordlin.entities.Snowflake
 
-
+/**
+ * A partial guild object. Represents an Offline Guild, or a Guild whose information has not been
+ * provided through Guild Create events during the Gateway connect.
+ *
+ * Documentation copied from [here](https://discordapp.com/developers/docs/resources/guild).
+ */
 class UnavailableGuild(val id: Snowflake, val unavailable: Boolean)

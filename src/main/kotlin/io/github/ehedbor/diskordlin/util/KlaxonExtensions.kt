@@ -7,7 +7,7 @@ import io.github.ehedbor.diskordlin.entities.gateway.Payload
 /**
  * Adds the custom converters for [Payload] and [Snowflake] to this object.
  */
-internal fun Klaxon.withDefaultConverters(): Klaxon {
+fun Klaxon.withDefaultConverters(): Klaxon {
     converter(Payload)
     converter(Snowflake)
     return this

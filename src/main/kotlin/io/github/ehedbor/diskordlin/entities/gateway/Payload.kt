@@ -101,18 +101,18 @@ data class Payload(
     inline fun <reified T : Any> getParsedDataAs() = getParsedDataAs(T::class)
 
     /**
-     * Parses the [data] as the given [type].
+     * Parses the [data] as the given [kclass].
      */
-    fun <T : Any> getParsedDataAs(type: KClass<T>): T? {
+    fun <T : Any> getParsedDataAs(kclass: KClass<T>): T? {
         return if (parsedData == null) {
             data?.let {
                 // Cache the parsed value once it is created
-                val parsed = type.safeCast(Klaxon().withDefaultConverters().fromJsonObject(data, type.java, type))
+                val parsed = kclass.safeCast(Klaxon().withDefaultConverters().fromJsonObject(data, kclass.java, kclass))
                 parsedData = parsed
                 parsed
             }
         } else {
-            type.safeCast(parsedData)
+            kclass.safeCast(parsedData)
         }
     }
 }
